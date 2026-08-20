@@ -5,12 +5,26 @@ import { DashboardShell } from '@/components/dashboard/DashboardShell'
 import { NotAuthorizedPanel } from '@/components/dashboard/NotAuthorizedPanel'
 import { LogoutButton } from '@/components/logout-button'
 import { getLoginUrl, parseDashboardMetrics, requestDashboardMetrics } from '@/server/aguy-web'
+import { VALID_PERIODS, type Period } from '@/types/dashboard'
 
 export const dynamic = 'force-dynamic'
 
-export default async function DashboardPage() {
+function requestedPeriod(value: string | string[] | undefined): Period {
+  const period = Array.isArray(value) ? value[0] : value
+  return VALID_PERIODS.includes(period as Period) ? (period as Period) : 'month'
+}
+
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ period?: string | string[] }>
+}) {
   const requestHeaders = await headers()
-  const response = await requestDashboardMetrics(requestHeaders.get('cookie'), 'month')
+  const { period } = await searchParams
+  const response = await requestDashboardMetrics(
+    requestHeaders.get('cookie'),
+    requestedPeriod(period),
+  )
 
   if (response.status === 401) redirect(getLoginUrl())
   if (response.status === 403) return <NotAuthorizedPanel />
