@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { createAguyApiClient } from '@a-guy/api-client'
 import { z } from 'zod'
 
 import {
@@ -9,6 +10,7 @@ import {
 } from '@/types/dashboard'
 
 const DEFAULT_WEB_ORIGIN = 'https://www.aguy.co.il'
+const DEFAULT_API_ORIGIN = 'https://api.aguy.co.il'
 const DEFAULT_DASHBOARD_ORIGIN = 'https://dash.aguy.co.il'
 
 function configuredOrigin(value: string | undefined, fallback: string): URL {
@@ -25,6 +27,10 @@ export function getWebOrigin(): URL {
   return configuredOrigin(process.env.AGUY_WEB_URL, DEFAULT_WEB_ORIGIN)
 }
 
+export function getApiOrigin(): URL {
+  return configuredOrigin(process.env.AGUY_API_URL, DEFAULT_API_ORIGIN)
+}
+
 export function getDashboardOrigin(): URL {
   return configuredOrigin(process.env.DASHBOARD_PUBLIC_URL, DEFAULT_DASHBOARD_ORIGIN)
 }
@@ -35,25 +41,19 @@ export function getLoginUrl(): string {
   return loginUrl.toString()
 }
 
-function forwardedHeaders(cookieHeader: string | null, requestId?: string): HeadersInit {
-  return {
-    accept: 'application/json',
-    ...(cookieHeader ? { cookie: cookieHeader } : {}),
-    ...(requestId ? { 'x-request-id': requestId } : {}),
-  }
-}
-
 export async function requestDashboardMetrics(
   cookieHeader: string | null,
   period: Period,
   options: { fetcher?: typeof fetch; requestId?: string } = {},
 ): Promise<Response> {
-  const url = new URL('/api/dashboard-metrics', getWebOrigin())
-  url.searchParams.set('period', period)
+  const client = createAguyApiClient({
+    baseUrl: getApiOrigin().origin,
+    cookie: cookieHeader,
+    fetch: options.fetcher,
+  })
 
-  return (options.fetcher ?? fetch)(url, {
-    cache: 'no-store',
-    headers: forwardedHeaders(cookieHeader, options.requestId),
+  return client.requestRaw(`/api/dashboard-metrics?period=${period}`, {
+    headers: options.requestId ? { 'x-request-id': options.requestId } : undefined,
   })
 }
 
@@ -66,10 +66,15 @@ export async function requestLogout(
   cookieHeader: string | null,
   options: { fetcher?: typeof fetch; requestId?: string } = {},
 ): Promise<Response> {
-  return (options.fetcher ?? fetch)(new URL('/api/auth/logout', getWebOrigin()), {
+  const client = createAguyApiClient({
+    baseUrl: getApiOrigin().origin,
+    cookie: cookieHeader,
+    fetch: options.fetcher,
+  })
+
+  return client.requestRaw('/api/auth/logout', {
     method: 'POST',
-    cache: 'no-store',
-    headers: forwardedHeaders(cookieHeader, options.requestId),
+    headers: options.requestId ? { 'x-request-id': options.requestId } : undefined,
   })
 }
 

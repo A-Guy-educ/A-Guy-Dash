@@ -1,4 +1,17 @@
 {
+  "shell": {
+    "appName": "Dashboard",
+    "dashboard": "Dashboard",
+    "web": "Learning site",
+    "teacher": "Teacher",
+    "menu": "Menu",
+    "skip": "Skip to dashboard",
+    "theme": "Theme",
+    "themeAuto": "Auto",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "footer": "A-Guy administrative analytics"
+  },
   "dashboard": {
     "title": "Analytics dashboard",
     "periodLabel": "Period",

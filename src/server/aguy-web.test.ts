@@ -16,8 +16,8 @@ describe('A-Guy-Web boundary', () => {
     )
   })
 
-  it('forwards the shared cookie only to the A-Guy-Web metrics endpoint', async () => {
-    vi.stubEnv('AGUY_WEB_URL', 'https://www.aguy.co.il')
+  it('forwards the shared cookie only to the platform API metrics endpoint', async () => {
+    vi.stubEnv('AGUY_API_URL', 'https://api.aguy.co.il')
     const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response('{}'))
 
     await requestDashboardMetrics('payload-token=secret', 'week', {
@@ -26,7 +26,7 @@ describe('A-Guy-Web boundary', () => {
     })
 
     const [url, init] = fetcher.mock.calls[0] ?? []
-    expect(String(url)).toBe('https://www.aguy.co.il/api/dashboard-metrics?period=week')
+    expect(String(url)).toBe('https://api.aguy.co.il/api/dashboard-metrics?period=week')
     expect(new Headers(init?.headers).get('cookie')).toBe('payload-token=secret')
     expect(new Headers(init?.headers).get('x-request-id')).toBe('request-1')
   })
@@ -40,12 +40,13 @@ describe('A-Guy-Web boundary', () => {
   })
 
   it('forwards the cookie to shared logout', async () => {
+    vi.stubEnv('AGUY_API_URL', 'https://api.aguy.co.il')
     const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response('{}'))
 
     await requestLogout('payload-token=secret', { fetcher })
 
     const [url, init] = fetcher.mock.calls[0] ?? []
-    expect(String(url)).toBe('https://www.aguy.co.il/api/auth/logout')
+    expect(String(url)).toBe('https://api.aguy.co.il/api/auth/logout')
     expect(init?.method).toBe('POST')
     expect(new Headers(init?.headers).get('cookie')).toBe('payload-token=secret')
   })

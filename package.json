@@ -16,6 +16,8 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@a-guy/api-client": "https://github.com/A-Guy-educ/A-Guy-Shared/releases/download/v0.1.1/a-guy-api-client-0.1.1.tgz",
+    "@a-guy/ui": "https://github.com/A-Guy-educ/A-Guy-Shared/releases/download/v0.1.1/a-guy-ui-0.1.1.tgz",
     "@radix-ui/react-slot": "^1.0.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",

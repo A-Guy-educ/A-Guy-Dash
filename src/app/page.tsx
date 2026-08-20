@@ -3,7 +3,6 @@ import { redirect } from 'next/navigation'
 
 import { DashboardShell } from '@/components/dashboard/DashboardShell'
 import { NotAuthorizedPanel } from '@/components/dashboard/NotAuthorizedPanel'
-import { LogoutButton } from '@/components/logout-button'
 import { getLoginUrl, parseDashboardMetrics, requestDashboardMetrics } from '@/server/aguy-web'
 import { VALID_PERIODS, type Period } from '@/types/dashboard'
 
@@ -32,12 +31,5 @@ export default async function DashboardPage({
 
   const metrics = await parseDashboardMetrics(response)
 
-  return (
-    <main>
-      <div className="mx-auto flex max-w-7xl justify-end px-4 pt-4">
-        <LogoutButton />
-      </div>
-      <DashboardShell initialData={metrics} />
-    </main>
-  )
+  return <DashboardShell initialData={metrics} />
 }

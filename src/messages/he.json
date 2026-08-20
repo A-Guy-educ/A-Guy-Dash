@@ -1,4 +1,17 @@
 {
+  "shell": {
+    "appName": "לוח בקרה",
+    "dashboard": "לוח בקרה",
+    "web": "אתר הלמידה",
+    "teacher": "מורים",
+    "menu": "תפריט",
+    "skip": "דלג ללוח הבקרה",
+    "theme": "ערכת נושא",
+    "themeAuto": "אוטומטי",
+    "themeLight": "בהיר",
+    "themeDark": "כהה",
+    "footer": "ניתוח נתוני הניהול של A-Guy"
+  },
   "dashboard": {
     "title": "לוח בקרה אנליטי",
     "periodLabel": "תקופה",

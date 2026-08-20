@@ -9,6 +9,11 @@ A-Guy-Dash never receives `PAYLOAD_SECRET` or `DATABASE_URL` and never reads or
 verifies the shared HttpOnly cookie. Its server forwards the cookie only to
 A-Guy-Web's authenticated APIs.
 
+The application shell comes from the immutable `@a-guy/ui` release, and API
+request behavior comes from `@a-guy/api-client`. Production API calls use
+`https://api.aguy.co.il`; that hostname is served by A-Guy-Web and does not own
+separate data or secrets.
+
 Production runs at `https://dash.aguy.co.il`. Anonymous users are redirected to
 A-Guy-Web's central login and return already authenticated through the shared
 `aguy.co.il` session cookie.
