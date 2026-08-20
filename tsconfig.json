@@ -1,57 +1,40 @@
 {
   "compilerOptions": {
-    "strict": true,
-    "baseUrl": ".",
-    "esModuleInterop": true,
     "target": "ES2022",
     "lib": [
       "DOM",
       "DOM.Iterable",
       "ES2022"
     ],
-    "allowJs": true,
-    "skipLibCheck": true,
+    "strict": true,
     "noEmit": true,
-    "incremental": true,
-    "jsx": "preserve",
+    "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
-    "sourceMap": true,
     "isolatedModules": true,
-    "types": [
-      "vitest/globals",
-      "@testing-library/jest-dom"
-    ],
+    "jsx": "preserve",
+    "incremental": true,
     "plugins": [
       {
         "name": "next"
       }
     ],
     "paths": {
-      "react": [
-        "./node_modules/@types/react"
-      ],
       "@/*": [
         "./src/*"
-      ],
-    }
+      ]
+    },
+    "allowJs": true,
+    "skipLibCheck": true
   },
   "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    "redirects.js",
-    "next-env.d.ts",
-    "next.config.js",
-    "next-sitemap.config.cjs"
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "vitest.config.ts",
+    ".next/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules",
-    ".next",
-    "src/ui/admin",
-    "tests",
-    "scripts",
-    "**/*.stories.tsx"
-  ],
+    "node_modules"
+  ]
 }

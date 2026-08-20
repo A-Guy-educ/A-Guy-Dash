@@ -3,15 +3,15 @@
   "quality": {
     "typecheck": "pnpm typecheck",
     "lint": "pnpm lint",
-    "format": "pnpm format",
-    "testUnit": "pnpm test:unit:coverage"
+    "format": "pnpm format:check",
+    "testUnit": "pnpm test"
   },
   "git": {
-    "defaultBranch": "dev"
+    "defaultBranch": "main"
   },
   "github": {
     "owner": "A-Guy-educ",
-    "repo": "A-Guy-Web",
+    "repo": "A-Guy-Dash",
     "operators": [
       "aguyaharonyair"
     ]
@@ -39,7 +39,7 @@
     ]
   },
   "qa": {
-    "fallbackUrl": "https://dev.aguy.co.il"
+    "fallbackUrl": "https://dash.aguy.co.il"
   },
   "release": {
     "releaseBranch": "main",
@@ -53,8 +53,7 @@
     "versionFiles": [
       "package.json"
     ],
-    "productionUrl": "https://www.aguy.co.il",
-    "e2eCommand": "npx tsx scripts/release-e2e-gate.ts",
+    "productionUrl": "https://dash.aguy.co.il",
     "timeoutMs": 1800000
   },
   "defaultExecutable": "classify",
