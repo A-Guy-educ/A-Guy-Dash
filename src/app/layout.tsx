@@ -19,7 +19,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const messages = locale === 'he' ? he : en
 
   return (
-    <html lang={locale} dir={locale === 'he' ? 'rtl' : 'ltr'}>
+    <html lang={locale} dir={locale === 'he' ? 'rtl' : 'ltr'} data-theme="light">
       <body className="min-h-screen bg-background text-foreground antialiased">
         <I18nProvider locale={locale} messages={messages}>
           {children}
