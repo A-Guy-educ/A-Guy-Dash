@@ -31,6 +31,7 @@ export function AppChrome({
       <AppShell
         actions={<LogoutButton />}
         appName={t('appName')}
+        brandHref={`${webOrigin}/`}
         footer={t('footer')}
         locale={locale}
         localeLabels={{ en: 'English', he: 'עברית' }}
