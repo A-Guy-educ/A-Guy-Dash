@@ -12,6 +12,8 @@ import {
 const DEFAULT_WEB_ORIGIN = 'https://www.aguy.co.il'
 const DEFAULT_API_ORIGIN = 'https://api.aguy.co.il'
 const DEFAULT_DASHBOARD_ORIGIN = 'https://dash.aguy.co.il'
+const DEFAULT_TEACHER_ORIGIN = 'https://teacher.aguy.co.il'
+const DEV_TEACHER_ORIGIN = 'https://teacher.dev.aguy.co.il'
 
 function configuredOrigin(value: string | undefined, fallback: string): URL {
   const url = new URL(value || fallback)
@@ -33,6 +35,16 @@ export function getApiOrigin(): URL {
 
 export function getDashboardOrigin(): URL {
   return configuredOrigin(process.env.DASHBOARD_PUBLIC_URL, DEFAULT_DASHBOARD_ORIGIN)
+}
+
+export function getTeacherOrigin(): URL {
+  if (process.env.AGUY_TEACHER_URL) {
+    return configuredOrigin(process.env.AGUY_TEACHER_URL, DEFAULT_TEACHER_ORIGIN)
+  }
+
+  return getDashboardOrigin().hostname.endsWith('.dev.aguy.co.il')
+    ? new URL(DEV_TEACHER_ORIGIN)
+    : new URL(DEFAULT_TEACHER_ORIGIN)
 }
 
 export function getLoginUrl(): string {

@@ -1,6 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { getLoginUrl, isDashboardOrigin, requestDashboardMetrics, requestLogout } from './aguy-web'
+import {
+  getLoginUrl,
+  getTeacherOrigin,
+  isDashboardOrigin,
+  requestDashboardMetrics,
+  requestLogout,
+} from './aguy-web'
 
 afterEach(() => {
   vi.unstubAllEnvs()
@@ -14,6 +20,12 @@ describe('A-Guy-Web boundary', () => {
     expect(getLoginUrl()).toBe(
       'https://www.aguy.co.il/login?returnTo=https%3A%2F%2Fdash.aguy.co.il%2F',
     )
+  })
+
+  it('uses the dev Teacher app beside the dev dashboard', () => {
+    vi.stubEnv('DASHBOARD_PUBLIC_URL', 'https://dash.dev.aguy.co.il')
+
+    expect(getTeacherOrigin().origin).toBe('https://teacher.dev.aguy.co.il')
   })
 
   it('forwards the shared cookie only to the platform API metrics endpoint', async () => {
