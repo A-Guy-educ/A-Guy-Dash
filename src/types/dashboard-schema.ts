@@ -26,6 +26,13 @@ export const dashboardMetricsSchema = z.object({
     returnedMultiplePercentage: z.number(),
     returningUsers: z.number(),
     returningUsersTotal: z.number(),
+    signupSourceBreakdown: z.object({
+      google: z.number(),
+      guykoren: z.number(),
+      direct: z.number(),
+      other: z.number(),
+      unknown: z.number(),
+    }),
   }),
   monthlySignups: z.array(z.object({ month: z.string(), count: z.number() })),
   contentCounts: z.object({
