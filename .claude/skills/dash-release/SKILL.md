@@ -46,29 +46,16 @@ grep -rE "from ['\"]mongodb['\"]|require\(['\"]mongodb['\"]\)|PAYLOAD_SECRET|ver
 
 ### 0a. Collect the commit set
 
-Dash is main-direct — the commit set to release is what's on `main` since the last release commit, NOT what's on `dev`. The `dev` branch is stale/experimental; pulling from it will regress prod.
-
 ```bash
-git fetch origin main
+git fetch origin dev main
 LAST_RELEASE_SHA=$(git log origin/main --grep="^chore: release v" --format="%H" -n 1)
 # First-release edge case — no previous release commit. Fall back to root.
 if [ -z "$LAST_RELEASE_SHA" ]; then
   LAST_RELEASE_SHA=$(git rev-list --max-parents=0 origin/main | head -1)
   echo "First release — walking history from repo root."
 fi
-COMMITS=$(git log --format="%H %s" "${LAST_RELEASE_SHA}..origin/main")
-FILES_CHANGED=$(git diff --name-only "${LAST_RELEASE_SHA}..origin/main")
-```
-
-Also worth a **branch-divergence sanity check** — if `dev` has commits `main` doesn't, mention them in the review so the user knows what's being deliberately excluded:
-
-```bash
-git fetch origin dev
-DEV_ONLY=$(git log --format="%h %s" "origin/main..origin/dev" 2>/dev/null || true)
-if [ -n "$DEV_ONLY" ]; then
-  echo "Note: dev has commits not on main (deliberately excluded from this release):"
-  echo "$DEV_ONLY"
-fi
+COMMITS=$(git log --format="%H %s" "${LAST_RELEASE_SHA}..origin/dev")
+FILES_CHANGED=$(git diff --name-only "${LAST_RELEASE_SHA}..origin/dev")
 ```
 
 ### 0b. Classify commits (with compound-prefix unwrap)
@@ -118,10 +105,10 @@ Print a compact markdown review to the user covering:
    For each match, name the file + the PR/commit.
 5. **Env-var deltas** — grep for new `process.env.<VAR>` reads not on `main`. Vercel snapshots env vars at deploy-creation, so new variables must be added to the Vercel project dashboard **before** Stage 4 or the prod build silently reads `undefined`. Dash's current env surface is small: `AGUY_WEB_URL`, `AGUY_API_URL`, `DASHBOARD_PUBLIC_URL`.
 6. **Trust-boundary violations** — re-run the preconditions grep against `FILES_CHANGED`. If any commit added a `mongodb` import, a `PAYLOAD_SECRET` read, or JWT verification code — halt. That's an AGENTS.md violation regardless of what else is going on.
-7. **Open PRs targeting `main`** — `gh pr list --base main --state open`. An unmerged release PR conflicts with a new one. Also list any `--base dev` PRs so the user knows about off-workflow work parked there (not blocking, but worth flagging).
-8. **CI health of `main` HEAD** — `gh run list --branch main --limit 5 --json name,conclusion,headSha`. Releasing on top of a red or in-flight run ships broken.
+7. **Open PRs targeting `dev` or `main`** — `gh pr list --base dev --state open` and `--base main`. A promotion PR conflicts if someone else has an open `dev → main` PR.
+8. **CI health of `dev` HEAD** — `gh run list --branch dev --limit 5 --json name,conclusion,headSha`. Releasing on top of a red or in-flight run ships broken.
 9. **Version drift** — compare `package.json` version, the latest `chore: release v` commit on `main`, and `git tag --sort=-v:refname | head -1`. Note any mismatch.
-10. **Dependency changes** — `git diff LAST_RELEASE_SHA..origin/main -- package.json pnpm-lock.yaml`. New prod deps can shift bundle size or introduce runtime surprises. Special attention to `@a-guy/ui` and `@a-guy/api-client` bumps — those come from `A-Guy-Shared` and are the coupling point with the platform.
+10. **Dependency changes** — `git diff LAST_RELEASE_SHA..origin/dev -- package.json pnpm-lock.yaml`. New prod deps can shift bundle size or introduce runtime surprises. Special attention to `@a-guy/ui` and `@a-guy/api-client` bumps — those come from `A-Guy-Shared` and are the coupling point with the platform.
 
 ### 0d. Sibling schema drift (Dash-specific)
 
@@ -155,16 +142,14 @@ Do NOT auto-proceed even if every check is green — the review's value is the h
 
 ## Stage 1 — `release-prepare`
 
-Bumps `package.json`, rewrites the CHANGELOG, and opens a `chore: release vX.Y.Z` PR into `main`.
+Kody's `release-prepare` bumps `package.json`, rewrites the CHANGELOG, and opens a `chore: release vX.Y.Z` PR into `dev`. Replicate that here.
 
-**Branch model note:** Dash uses **main-direct** (unlike Web/Admin's dev → main promotion). All PRs target `main`. See [`project_dash_branch_policy.md`](../../../../../.claude/projects/c--Users-kotz9-OneDrive-Desktop-work-A-Guy-Dash/memory/project_dash_branch_policy.md) for why. The `dev` branch exists but is stale/experimental — do NOT pull from it during release.
-
-### 1a. Sync `main`
+### 1a. Sync `dev`
 
 ```bash
-git fetch origin main
-git checkout main
-git pull origin main
+git fetch origin dev
+git checkout dev
+git pull origin dev
 ```
 
 ### 1b. Determine the next version
@@ -213,7 +198,7 @@ git commit -m "chore: release v${NEXT}" -m "Bumps package.json to ${NEXT} and up
 git push -u origin "$BRANCH"
 
 gh pr create \
-  --base main \
+  --base dev \
   --head "$BRANCH" \
   --title "chore: release v${NEXT}" \
   --body "$(cat <<EOF
@@ -223,7 +208,7 @@ Automated release PR opened by the dash-release skill.
 
 <paste the CHANGELOG section here>
 
-The skill will merge this into \`main\`, tag the commit, then run \`vercel --prod\`.
+The skill will merge this into \`dev\`, then open a promotion PR into \`main\`, then run \`vercel --prod\`.
 EOF
 )"
 ```
@@ -234,11 +219,11 @@ Capture the PR number as `RELEASE_PR`.
 
 ## Stage 2 — `release-merge`
 
-Wait for CI on the release PR and merge it into `main`. Use a **merge commit** (not squash) so the release commit stays walkable by Stage 0a's `git log --grep="^chore: release v"` in the next cycle.
+Wait for CI on the release PR and merge it into `dev`.
 
 ```bash
 gh pr checks "$RELEASE_PR" --watch --interval 15
-gh pr merge "$RELEASE_PR" --merge --delete-branch
+gh pr merge "$RELEASE_PR" --squash --delete-branch
 ```
 
 If CI fails, invoke `@kody fix-ci` on the PR and re-watch — do not merge with red checks.
@@ -251,11 +236,41 @@ MERGE_SHA=$(gh pr view "$RELEASE_PR" --json mergeCommit --jq .mergeCommit.oid)
 
 ---
 
-## Stage 3 — (skipped for Dash — main-direct)
+## Stage 3 — `release-promote`
 
-Web and Admin have a `promote: dev -> main` PR at this stage. Dash doesn't — Stage 1 already targeted `main`, so the code is on `main` after Stage 2. Skip directly to Stage 4.
+Open a PR titled `promote: dev -> main (vX.Y.Z)` — same pattern as Web/Admin.
 
-Dash has no `vercel-deploy.yml` workflow — merging to `main` does NOT trigger a deploy. Stage 4 is what actually ships.
+```bash
+git fetch origin dev main
+git checkout dev
+git pull origin dev
+
+gh pr create \
+  --base main \
+  --head dev \
+  --title "promote: dev -> main (v${NEXT})" \
+  --body "$(cat <<EOF
+Automated release promotion PR opened by the dash-release skill — promotes \`dev\` to \`main\` for release **v${NEXT}**.
+
+<!-- kody-changelog-start -->
+## What's changing in v${NEXT}
+
+<paste the CHANGELOG section again>
+<!-- kody-changelog-end -->
+
+Merge this PR to promote v${NEXT} to \`main\`.
+EOF
+)"
+```
+
+Capture as `PROMOTE_PR`. Wait for checks and merge with a **merge commit** (not squash — this preserves the promotion boundary that Stage 0a walks back to):
+
+```bash
+gh pr checks "$PROMOTE_PR" --watch --interval 15
+gh pr merge "$PROMOTE_PR" --merge
+```
+
+Dash has no `vercel-deploy.yml` workflow — merging to `main` does NOT trigger a deploy. Stage 4 is what ships.
 
 ---
 
@@ -389,23 +404,23 @@ Also update the auto-memory: bump the tail of `project_deploy_policy.md` (or whe
 - **Never alias a preview build to `dash.aguy.co.il`.** That's the prod alias. The rest of the alias/scope story is in [`../../../../CLAUDE_SHARED.md`](../../../../CLAUDE_SHARED.md).
 - **Never skip Stage 0.** The pre-flight review is where the trust-boundary + sibling-schema-drift catches live — the two failure modes most likely to take Dash down.
 - **Never skip Stage 6.** "Merged to main + vercel returned" is not "shipped." Users hit `dash.aguy.co.il`; check the alias landed there.
-- **Never squash-merge the release PR.** Use `--merge`. The merge commit preserves the `chore: release vX.Y.Z` subject that Stage 0a's `git log --grep` walks back to in the next cycle.
-- **Never bump `package.json` outside a release PR.** All version changes go through Stage 1 targeting `main`.
-- **Never target `dev` with a release PR.** Dash is main-direct; the `dev` branch is stale and contains environment-only experiments. Pulling from it will regress prod.
+- **Never squash-merge the promotion PR.** Merge commit preserves the promotion boundary — Stage 0a walks `git log` back to the previous release commit.
+- **Never bump `package.json` on `dev` without opening a release PR.** All version changes go through Stage 1.
+- **Never push or PR directly to `main`.** All feature work + releases route through `dev`. The `promote: dev -> main` PR in Stage 3 is the ONLY thing that ever targets `main`.
 - **Never add DB/auth/secrets to Dash under any circumstances.** AGENTS.md is the contract; the preconditions grep is the guardrail.
 
 ---
 
 ## Keeping this in sync with `web-release` / `admin-release`
 
-Forked from [`../../../../A-Guy-Admin/.claude/skills/admin-release/SKILL.md`](../../../../A-Guy-Admin/.claude/skills/admin-release/SKILL.md), which was itself forked from [`../../../../A-Guy-Web/.agents/skills/web-release/SKILL.md`](../../../../A-Guy-Web/.agents/skills/web-release/SKILL.md). Pipeline logic mostly stays identical across the three repos. Dash's differences:
+Forked from [`../../../../A-Guy-Admin/.claude/skills/admin-release/SKILL.md`](../../../../A-Guy-Admin/.claude/skills/admin-release/SKILL.md), which was itself forked from [`../../../../A-Guy-Web/.agents/skills/web-release/SKILL.md`](../../../../A-Guy-Web/.agents/skills/web-release/SKILL.md). Pipeline logic (Stages 0–7) is meant to stay identical across the three repos. Dash's differences:
 
-- **Main-direct branch model (Stages 1–3)** — Web/Admin use dev → main promotion. Dash releases directly on `main` (Stage 3 is skipped). Per AGENTS.md line 16 and confirmed by v0.2.0 release evidence 2026-09-08. The `dev` branch exists but is stale/experimental.
 - **No Docker/Render stage** — Vercel is the only prod surface. Admin's Stage 4.5 is dropped entirely.
 - **No vercel-deploy.yml workflow** — Dash deploys purely via CLI in Stage 4. Admin has a workflow that fires on push to main; Dash doesn't.
 - **Trust-boundary precondition** — Dash's AGENTS.md forbids DB/auth/secrets. Web/Admin don't have this constraint (they ARE the DB/auth surface).
 - **Sibling-schema-drift check (Stage 0d)** — Dash-specific. The Zod schema mirrors Web's producer; drift breaks the whole dashboard. Web/Admin own their own contracts, no upstream to coordinate with.
 - **Smoke script** — Web has `scripts/smoke-web-api.ts`, Admin has curl probes, Dash also uses curl probes. Writing `scripts/smoke-dash.ts` is a nice-to-have follow-up.
+- **First-release handling** — Dash starts from v0.1.0 with no CHANGELOG. Web/Admin are past this phase.
 - **Sensitive-path list (Stage 0c)** — Dash's list is much shorter (proxy, schema, routes, config). Web/Admin have collection/webhook/payment paths.
 
-When Web or Admin's skill improves (better classifier, new pre-flight check), port the change here — but do NOT port the promotion-PR flow. Dash is main-direct by design.
+When Web or Admin's skill improves (better classifier, new pre-flight check), port the change here — don't let the three drift.
