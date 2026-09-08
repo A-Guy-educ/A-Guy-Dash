@@ -26,6 +26,18 @@ export const dashboardMetricsSchema = z.object({
     returnedMultiplePercentage: z.number(),
     returningUsers: z.number(),
     returningUsersTotal: z.number(),
+    // Zeroed default so a rolling Web deploy (or an older upstream that hasn't
+    // adopted PR #1180 yet) degrades the widget to an empty-state render
+    // instead of 502-ing the entire dashboard via safeParse rejection.
+    signupSourceBreakdown: z
+      .object({
+        google: z.number(),
+        guykoren: z.number(),
+        direct: z.number(),
+        other: z.number(),
+        unknown: z.number(),
+      })
+      .default({ google: 0, guykoren: 0, direct: 0, other: 0, unknown: 0 }),
   }),
   monthlySignups: z.array(z.object({ month: z.string(), count: z.number() })),
   contentCounts: z.object({

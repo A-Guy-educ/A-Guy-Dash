@@ -72,6 +72,18 @@
       "returnedOnce": "חזרו לפחות פעם",
       "returnedMultiple": "חזרו יותר מפעמיים"
     },
+    "signupSources": {
+      "section": "מקורות הרשמה",
+      "emptyState": "אין הרשמות בתקופה זו",
+      "barAriaLabel": "פילוח מקורות הרשמה",
+      "labels": {
+        "google": "גוגל",
+        "guykoren": "גיא קורן",
+        "direct": "ישיר",
+        "other": "אחר",
+        "unknown": "לא ידוע"
+      }
+    },
     "content": {
       "section": "ספריית תוכן",
       "courses": "קורסים",

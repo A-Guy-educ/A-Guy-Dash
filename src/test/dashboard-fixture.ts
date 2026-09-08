@@ -27,6 +27,13 @@ export function dashboardFixture(): DashboardMetricsResponse {
       returnedMultiplePercentage: 1,
       returningUsers: 1,
       returningUsersTotal: 1,
+      signupSourceBreakdown: {
+        google: 12,
+        guykoren: 5,
+        direct: 3,
+        other: 1,
+        unknown: 4,
+      },
     },
     monthlySignups: [],
     contentCounts: { courses: 1, lessons: 1, exercises: 1, formulaSheets: 1, prompts: 1 },
