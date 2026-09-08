@@ -10,6 +10,20 @@ export type Period = 'week' | 'month' | 'year'
 
 export const VALID_PERIODS: readonly Period[] = ['week', 'month', 'year']
 
+/**
+ * Signup attribution counts for the selected period. Buckets sum to the same
+ * total as registeredThisMonth / registeredThisWeek / etc. — both anchor on
+ * user.createdAt. Only Google OAuth signups carry attribution today; users
+ * without a `signupSource` value (pre-feature legacy) land in `unknown`.
+ */
+export interface SignupSourceBreakdown {
+  google: number
+  guykoren: number
+  direct: number
+  other: number
+  unknown: number
+}
+
 export interface UserMetrics {
   activeUsersToday: number
   activeUsersYesterday: number
@@ -34,6 +48,7 @@ export interface UserMetrics {
   returnedMultiplePercentage: number
   returningUsers: number
   returningUsersTotal: number
+  signupSourceBreakdown: SignupSourceBreakdown
 }
 
 /** One month bucket for the year-view signups chart. `month` is "YYYY-MM". */

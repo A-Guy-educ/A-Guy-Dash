@@ -72,6 +72,18 @@
       "returnedOnce": "Returned once",
       "returnedMultiple": "Returned >2x"
     },
+    "signupSources": {
+      "section": "Signup sources",
+      "emptyState": "No signups this period",
+      "barAriaLabel": "Signup source breakdown",
+      "labels": {
+        "google": "Google",
+        "guykoren": "GuyKoren",
+        "direct": "Direct",
+        "other": "Other",
+        "unknown": "Unknown"
+      }
+    },
     "content": {
       "section": "Content library",
       "courses": "Courses",

@@ -14,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useLocale, useTranslations } from '@/components/i18n'
 import type { UserMetrics } from '@/types/dashboard'
 import { MetricCard } from './MetricCard'
+import { SignupSourceBreakdownCard } from './SignupSourceBreakdownCard'
 import { TrendBadge } from './TrendBadge'
 
 interface Props {
@@ -70,6 +71,9 @@ export function UserMetricsSection({ metrics }: Props) {
         />
         <MetricCard label={t('lastMonth')} value={metrics.registeredLastMonth} />
       </div>
+
+      {/* Signup source attribution — sums to the period's registered count */}
+      <SignupSourceBreakdownCard breakdown={metrics.signupSourceBreakdown} />
 
       {/* Active users */}
       <Card>
