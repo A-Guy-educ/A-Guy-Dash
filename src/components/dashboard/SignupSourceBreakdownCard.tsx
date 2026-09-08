@@ -84,7 +84,7 @@ export function SignupSourceBreakdownCard({ breakdown }: Props) {
                     </span>
                     <span className="text-body-sm text-muted-foreground tabular-nums ms-auto">
                       {count.toLocaleString(locale)}
-                      <span className="ms-1 text-body-xs">({pct.toFixed(0)}%)</span>
+                      <span className="ms-1 text-body-xs">({pct.toFixed(1)}%)</span>
                     </span>
                   </li>
                 )
