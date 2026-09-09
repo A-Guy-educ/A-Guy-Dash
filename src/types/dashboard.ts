@@ -166,6 +166,59 @@ export interface TokenMetrics {
   topUsers: TopUserByTokens[]
 }
 
+/**
+ * Product Health tab (Tab 1) — Spec v0.2. Five rate KPIs with paired trend
+ * lines. Every metric surfaces `numerator` + `denominator` so weekly/monthly
+ * buckets can be recomputed rather than averaged (Section 4 of the spec).
+ *
+ * The whole block is optional: Web owns the aggregation and may ship the
+ * field after Dash. When the field is absent the UI renders an "awaiting
+ * upstream" state instead of failing the entire response validation.
+ */
+export const PRODUCT_HEALTH_METRIC_KEYS = [
+  'activeUserRate',
+  'engagementRate',
+  'retentionRate',
+  'inactiveChurnRate',
+  'lessonCompletionRate',
+] as const
+
+export type ProductHealthMetricKey = (typeof PRODUCT_HEALTH_METRIC_KEYS)[number]
+
+export type ProductHealthDateRange = '7d' | '30d' | '90d' | 'custom'
+export type ProductHealthGranularity = 'daily' | 'weekly' | 'monthly'
+
+export interface ProductHealthTrendBucket {
+  bucketStart: string
+  bucketEnd: string
+  value: number | null
+  numerator: number | null
+  denominator: number | null
+}
+
+export interface ProductHealthMetric {
+  value: number | null
+  numerator: number | null
+  denominator: number | null
+  comparisonValue: number | null
+  deltaPp: number | null
+  trend: ProductHealthTrendBucket[]
+}
+
+export interface ProductHealthCourseOption {
+  id: string
+  title: string
+}
+
+export interface ProductHealth {
+  periodStart: string
+  periodEnd: string
+  courseId: string | null
+  granularity: ProductHealthGranularity
+  metrics: Record<ProductHealthMetricKey, ProductHealthMetric>
+  availableCourses: ProductHealthCourseOption[]
+}
+
 export interface DashboardMetricsResponse {
   period: Period
   userMetrics: UserMetrics
@@ -174,6 +227,7 @@ export interface DashboardMetricsResponse {
   engagement: EngagementMetrics
   revenueMetrics: RevenueMetrics
   tokenMetrics: TokenMetrics
+  productHealth?: ProductHealth
 }
 
 export { dashboardMetricsSchema } from './dashboard-schema'

@@ -24,11 +24,61 @@
     "adminOnlyBody": "לחשבון שלך אין הרשאה לצפות בעמוד זה.",
     "period": { "week": "שבוע", "month": "חודש", "year": "שנה" },
     "tabs": {
+      "productHealth": "בריאות המוצר",
       "users": "משתמשים",
       "content": "תוכן",
       "engagement": "מעורבות",
       "tokens": "טוקנים",
       "revenue": "הכנסות"
+    },
+    "productHealth": {
+      "section": "בריאות המוצר",
+      "overviewTitle": "סקירת KPI",
+      "trendsTitle": "מגמות KPI",
+      "vsPrevious": "לעומת התקופה הקודמת",
+      "awaitingUpstream": "אגרגציית הנתונים עדיין לא זמינה. תצוגת פריסה בלבד — הערכים יופיעו לאחר ש-Web ישלח את חוזה productHealth.",
+      "allCourses": "כל הקורסים",
+      "courseFilter": "סינון קורס",
+      "trendEmpty": "אין נתונים",
+      "valueLabel": "ערך",
+      "numeratorLabel": "מונה",
+      "denominatorLabel": "מכנה",
+      "na": "לא זמין",
+      "range": {
+        "7d": "7 ימים אחרונים",
+        "30d": "30 ימים אחרונים",
+        "90d": "90 ימים אחרונים",
+        "custom": "מותאם",
+        "customStart": "תאריך התחלה",
+        "customEnd": "תאריך סיום"
+      },
+      "granularity": {
+        "daily": "יומי",
+        "weekly": "שבועי",
+        "monthly": "חודשי"
+      },
+      "metrics": {
+        "activeUserRate": {
+          "label": "שיעור משתמשים פעילים",
+          "tooltip": "משתמשים פעילים / כלל המשתמשים המזוהים × 100. פעיל = התחיל שיעור ונשאר בו יותר מדקה."
+        },
+        "engagementRate": {
+          "label": "שיעור מעורבות",
+          "tooltip": "משתמשים מעורבים / משתמשים פעילים × 100. מעורב = פעיל + ניהל שיחה עם הצ׳אט בתקופה."
+        },
+        "retentionRate": {
+          "label": "שיעור שימור",
+          "tooltip": "משתמשים ששומרו / משתמשים כשירים לשימור × 100. ברירת מחדל: חלון מתגלגל של 30 יום."
+        },
+        "inactiveChurnRate": {
+          "label": "שיעור נטישה / חוסר פעילות",
+          "tooltip": "משתמשים שהיו פעילים והפכו לא פעילים / פעילים קודמים × 100. ירידה היא שיפור."
+        },
+        "lessonCompletionRate": {
+          "label": "שיעור השלמת שיעורים",
+          "tooltip": "שיעורים שהושלמו / שיעורים שהתחילו × 100."
+        }
+      }
     },
     "tokens": {
       "section": "שימוש בטוקני LLM",
