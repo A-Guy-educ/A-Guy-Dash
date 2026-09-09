@@ -7,7 +7,17 @@ import { dashboardMetricsSchema } from '@/types/dashboard'
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-const periodSchema = z.enum(['week', 'month', 'year'])
+const periodSchema = z.enum(['day', 'week', 'month', 'year'])
+
+// Web's aggregation endpoint doesn't yet distinguish 'day' from the other
+// windows — its data lookup returns the same field shape regardless of the
+// requested period. Until Web ships proper daily aggregation, we forward
+// 'day' as 'month' upstream and override the echoed period field so the
+// client-side refetch guard (period === data.period) stays coherent.
+// Remove once Web accepts 'day' natively.
+function upstreamPeriodFor(requested: z.infer<typeof periodSchema>): 'week' | 'month' | 'year' {
+  return requested === 'day' ? 'month' : requested
+}
 
 function errorForStatus(status: number): string {
   if (status === 400) return 'Invalid period'
@@ -25,9 +35,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   }
 
   try {
-    const upstream = await requestDashboardMetrics(request.headers.get('cookie'), period.data, {
-      requestId,
-    })
+    const upstream = await requestDashboardMetrics(
+      request.headers.get('cookie'),
+      upstreamPeriodFor(period.data),
+      { requestId },
+    )
 
     if (!upstream.ok) {
       return NextResponse.json(
@@ -48,9 +60,15 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       )
     }
 
-    return NextResponse.json(parsed.data, {
-      headers: { 'Cache-Control': 'no-store', 'X-Request-ID': requestId },
-    })
+    // Echo the client's requested period back verbatim so the shell's
+    // refetch guard (period === data.period) settles instead of looping
+    // when the upstream normalised 'day' → 'month'.
+    return NextResponse.json(
+      { ...parsed.data, period: period.data },
+      {
+        headers: { 'Cache-Control': 'no-store', 'X-Request-ID': requestId },
+      },
+    )
   } catch (error) {
     console.error('Dashboard metrics proxy failed', { error, requestId })
     return NextResponse.json(

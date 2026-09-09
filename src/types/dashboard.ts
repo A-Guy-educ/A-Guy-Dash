@@ -6,9 +6,9 @@
  * change here breaks the widgets — coordinate before touching.
  */
 
-export type Period = 'week' | 'month' | 'year'
+export type Period = 'day' | 'week' | 'month' | 'year'
 
-export const VALID_PERIODS: readonly Period[] = ['week', 'month', 'year']
+export const VALID_PERIODS: readonly Period[] = ['day', 'week', 'month', 'year']
 
 /**
  * Signup attribution counts for the selected period. Buckets sum to the same

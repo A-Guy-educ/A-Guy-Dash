@@ -22,7 +22,7 @@
     "loggingOut": "מתנתק…",
     "adminOnlyTitle": "נדרשת הרשאת מנהל",
     "adminOnlyBody": "לחשבון שלך אין הרשאה לצפות בעמוד זה.",
-    "period": { "week": "שבוע", "month": "חודש", "year": "שנה" },
+    "period": { "day": "יום", "week": "שבוע", "month": "חודש", "year": "שנה" },
     "tabs": {
       "productHealth": "בריאות המוצר",
       "users": "משתמשים",
