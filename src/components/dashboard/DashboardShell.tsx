@@ -36,6 +36,7 @@ import { ContentCountsSection } from './ContentCountsSection'
 import { EngagementSection } from './EngagementSection'
 import { MonthlySignupsSection } from './MonthlySignupsSection'
 import { PeriodSelector } from './PeriodSelector'
+import { ProductHealthSection } from './product-health/ProductHealthSection'
 import { RevenueSection } from './RevenueSection'
 import { TokensSection } from './TokensSection'
 import { UserMetricsSection } from './UserMetricsSection'
@@ -108,14 +109,19 @@ export function DashboardShell({ initialData }: Props) {
         </div>
       )}
 
-      <Tabs defaultValue="users" className="space-y-6">
+      <Tabs defaultValue="productHealth" className="space-y-6">
         <TabsList>
+          <TabsTrigger value="productHealth">{t('tabs.productHealth')}</TabsTrigger>
           <TabsTrigger value="users">{t('tabs.users')}</TabsTrigger>
           <TabsTrigger value="content">{t('tabs.content')}</TabsTrigger>
           <TabsTrigger value="engagement">{t('tabs.engagement')}</TabsTrigger>
           <TabsTrigger value="tokens">{t('tabs.tokens')}</TabsTrigger>
           <TabsTrigger value="revenue">{t('tabs.revenue')}</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="productHealth">
+          <ProductHealthSection productHealth={data.productHealth} />
+        </TabsContent>
 
         <TabsContent value="users" className="space-y-8">
           <UserMetricsSection metrics={data.userMetrics} />
