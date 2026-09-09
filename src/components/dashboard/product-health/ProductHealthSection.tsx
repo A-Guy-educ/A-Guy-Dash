@@ -2,26 +2,28 @@
  * Product Health tab (Spec v0.2, Tab 1). Renders the KPI Overview + KPI
  * Trends blocks for the five product-health rates.
  *
- * Data-flow contract: this component is a pure consumer of the optional
- * `productHealth` field on `DashboardMetricsResponse`. The upstream Web
- * endpoint owns definition (Δ pp, cohort windows, >60s dwell rule, etc.);
- * Dash never derives a rate from raw counts.
+ * Data flow: the initial payload comes from the shell's server-rendered
+ * fetch (`data.productHealth`). Subsequent filter changes hit the
+ * dedicated `/api/product-health` proxy so the Users/Tokens/Revenue tabs
+ * don't refetch every time the manager tweaks a range or course.
  *
- * Filter state (date range, course, granularity) is local. When Web ships
- * the aggregation, wire these values into a fetch call — until then they
- * only drive the visible controls so managers can preview the layout and
- * the boss can sign off on the definitional decisions in spec §9.
+ * Fetch coalescing: the derived `queryKey` string drives a single effect;
+ * building a new URLSearchParams-shaped record on every render would
+ * invalidate a naive `useEffect([query])` on every keystroke of the
+ * custom-range date inputs. Custom range is gated until both start and
+ * end are filled to avoid firing off partial queries.
  *
  * @fileType component
  * @domain dashboard
  * @pattern container
- * @ai-summary Product Health tab — five KPI cards + five trend charts + filters
+ * @ai-summary Product Health tab — five KPI cards + five trend charts + filters + fetch
  */
 
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useTranslations } from '@/components/i18n'
 import type {
@@ -49,17 +51,84 @@ function autoGranularity(range: ProductHealthDateRange): ProductHealthGranularit
   if (range === '7d') return 'daily'
   if (range === '30d') return 'daily'
   if (range === '90d') return 'weekly'
-  return 'weekly' // custom defaults to weekly; user can override
+  return 'weekly'
 }
 
-export function ProductHealthSection({ productHealth }: Props) {
+interface Query {
+  range: ProductHealthDateRange
+  granularity: ProductHealthGranularity
+  courseId: string | null
+  start: string
+  end: string
+}
+
+function buildQueryString(q: Query): string | null {
+  // Custom needs both dates before we hit the wire.
+  if (q.range === 'custom' && (!q.start || !q.end)) return null
+  const params = new URLSearchParams()
+  params.set('range', q.range)
+  params.set('granularity', q.granularity)
+  if (q.range === 'custom') {
+    params.set('start', q.start)
+    params.set('end', q.end)
+  }
+  if (q.courseId) params.set('courseId', q.courseId)
+  return params.toString()
+}
+
+export function ProductHealthSection({ productHealth: initial }: Props) {
   const t = useTranslations('dashboard.productHealth')
+  const tShell = useTranslations('dashboard')
 
   const [range, setRange] = useState<ProductHealthDateRange>('30d')
   const [customStart, setCustomStart] = useState('')
   const [customEnd, setCustomEnd] = useState('')
   const [courseId, setCourseId] = useState<string | null>(null)
   const [granularity, setGranularity] = useState<ProductHealthGranularity>(autoGranularity('30d'))
+
+  const [productHealth, setProductHealth] = useState<ProductHealth | undefined>(initial)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [hasError, setHasError] = useState(false)
+
+  const query: Query = { range, granularity, courseId, start: customStart, end: customEnd }
+  const queryKey = buildQueryString(query)
+
+  const abortRef = useRef<AbortController | null>(null)
+  const isInitialMount = useRef(true)
+
+  const refetch = useCallback(async (qs: string) => {
+    abortRef.current?.abort()
+    const controller = new AbortController()
+    abortRef.current = controller
+    setIsRefreshing(true)
+    setHasError(false)
+    try {
+      const res = await fetch(`/api/product-health?${qs}`, {
+        credentials: 'include',
+        cache: 'no-store',
+        signal: controller.signal,
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const json = (await res.json()) as ProductHealth | null
+      setProductHealth(json ?? undefined)
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') return
+      setHasError(true)
+    } finally {
+      if (abortRef.current === controller) setIsRefreshing(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    // Skip the very first render — the shell already server-rendered the
+    // initial slice with matching defaults, so a mount-time fetch would
+    // just repaint the same data.
+    if (isInitialMount.current) {
+      isInitialMount.current = false
+      return
+    }
+    if (queryKey) void refetch(queryKey)
+  }, [queryKey, refetch])
 
   const handleRangeChange = (next: ProductHealthDateRange) => {
     setRange(next)
@@ -86,7 +155,12 @@ export function ProductHealthSection({ productHealth }: Props) {
   return (
     <section className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-content-gap">
-        <h2 className="text-heading-lg font-semibold">{t('section')}</h2>
+        <div>
+          <h2 className="text-heading-lg font-semibold">{t('section')}</h2>
+          {isRefreshing && (
+            <p className="text-body-xs text-muted-foreground italic mt-1">{tShell('refreshing')}</p>
+          )}
+        </div>
         <div className="flex flex-wrap items-center gap-2">
           <DateRangeSelector
             value={range}
@@ -95,12 +169,36 @@ export function ProductHealthSection({ productHealth }: Props) {
             customEnd={customEnd}
             onCustomStartChange={setCustomStart}
             onCustomEndChange={setCustomEnd}
+            disabled={isRefreshing}
           />
-          <CourseFilter value={courseId} onChange={setCourseId} options={courses} />
+          <CourseFilter
+            value={courseId}
+            onChange={setCourseId}
+            options={courses}
+            disabled={isRefreshing}
+          />
         </div>
       </div>
 
-      {!productHealth && (
+      {hasError && (
+        <div
+          role="alert"
+          className="flex items-center justify-between gap-content-gap rounded-lg border border-error/40 bg-error/10 p-card-padding-sm"
+        >
+          <p className="text-body-sm text-foreground">{tShell('loadError')}</p>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => queryKey && void refetch(queryKey)}
+            disabled={isRefreshing || !queryKey}
+          >
+            {tShell('retry')}
+          </Button>
+        </div>
+      )}
+
+      {!productHealth && !hasError && (
         <div
           role="status"
           className="rounded-lg border border-dashed border-border p-card-padding-sm"
@@ -131,7 +229,11 @@ export function ProductHealthSection({ productHealth }: Props) {
       <div>
         <div className="flex flex-wrap items-center justify-between gap-content-gap mb-3">
           <h3 className="text-heading-md font-semibold">{t('trendsTitle')}</h3>
-          <GranularityToggle value={granularity} onChange={setGranularity} />
+          <GranularityToggle
+            value={granularity}
+            onChange={setGranularity}
+            disabled={isRefreshing}
+          />
         </div>
         <div className="grid gap-content-gap grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {kpiEntries.map(({ key, metric, label }) => (
