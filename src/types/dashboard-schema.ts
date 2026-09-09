@@ -33,7 +33,7 @@ const productHealthSchema = z.object({
 })
 
 export const dashboardMetricsSchema = z.object({
-  period: z.enum(['week', 'month', 'year']),
+  period: z.enum(['day', 'week', 'month', 'year']),
   userMetrics: z.object({
     activeUsersToday: z.number(),
     activeUsersYesterday: z.number(),

@@ -124,7 +124,7 @@ export function DashboardShell({ initialData }: Props) {
         </TabsContent>
 
         <TabsContent value="users" className="space-y-8">
-          <UserMetricsSection metrics={data.userMetrics} />
+          <UserMetricsSection metrics={data.userMetrics} period={data.period} />
           <MonthlySignupsSection months={data.monthlySignups} />
         </TabsContent>
 

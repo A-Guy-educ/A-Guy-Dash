@@ -22,7 +22,7 @@
     "loggingOut": "Logging out…",
     "adminOnlyTitle": "Admin access required",
     "adminOnlyBody": "Your account is not authorized to view this page.",
-    "period": { "week": "Week", "month": "Month", "year": "Year" },
+    "period": { "day": "Day", "week": "Week", "month": "Month", "year": "Year" },
     "tabs": {
       "productHealth": "Product Health",
       "users": "Users",

@@ -13,11 +13,29 @@ describe('dashboard metrics proxy', () => {
   it('rejects an invalid period before calling A-Guy-Web', async () => {
     const { GET } = await import('./route')
     const response = await GET(
-      new NextRequest('https://dash.aguy.co.il/api/dashboard-metrics?period=day'),
+      new NextRequest('https://dash.aguy.co.il/api/dashboard-metrics?period=hour'),
     )
 
     expect(response.status).toBe(400)
     expect(requestDashboardMetrics).not.toHaveBeenCalled()
+  })
+
+  it('forwards day as month upstream and echoes day back to the client', async () => {
+    requestDashboardMetrics.mockResolvedValue(Response.json(dashboardFixture()))
+    const { GET } = await import('./route')
+
+    const response = await GET(
+      new NextRequest('https://dash.aguy.co.il/api/dashboard-metrics?period=day'),
+    )
+
+    expect(response.status).toBe(200)
+    expect(requestDashboardMetrics).toHaveBeenCalledWith(
+      null,
+      'month',
+      expect.objectContaining({ requestId: expect.any(String) }),
+    )
+    const body = (await response.json()) as { period: string }
+    expect(body.period).toBe('day')
   })
 
   it('preserves the upstream authorization result', async () => {
