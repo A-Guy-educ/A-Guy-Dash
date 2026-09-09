@@ -230,4 +230,4 @@ export interface DashboardMetricsResponse {
   productHealth?: ProductHealth
 }
 
-export { dashboardMetricsSchema } from './dashboard-schema'
+export { dashboardMetricsSchema, productHealthSchema } from './dashboard-schema'

@@ -17,7 +17,7 @@ const productHealthMetricSchema = z.object({
   ),
 })
 
-const productHealthSchema = z.object({
+export const productHealthSchema = z.object({
   periodStart: z.string(),
   periodEnd: z.string(),
   courseId: z.string().nullable(),

@@ -69,6 +69,44 @@ export async function requestDashboardMetrics(
   })
 }
 
+/**
+ * Params forwarded to Web's `/api/dashboard-metrics` to shape the
+ * `productHealth` slice. All optional — Web defaults to range=30d, All
+ * Courses, daily. See A-Guy-Web PR #1187 for the accepted values.
+ */
+export interface ProductHealthQuery {
+  range?: string
+  start?: string
+  end?: string
+  courseId?: string
+  granularity?: string
+}
+
+export async function requestProductHealth(
+  cookieHeader: string | null,
+  query: ProductHealthQuery,
+  options: { fetcher?: typeof fetch; requestId?: string } = {},
+): Promise<Response> {
+  const client = createAguyApiClient({
+    baseUrl: getApiOrigin().origin,
+    cookie: cookieHeader,
+    fetch: options.fetcher,
+  })
+
+  const params = new URLSearchParams()
+  if (query.range) params.set('range', query.range)
+  if (query.start) params.set('start', query.start)
+  if (query.end) params.set('end', query.end)
+  if (query.courseId) params.set('courseId', query.courseId)
+  if (query.granularity) params.set('granularity', query.granularity)
+
+  const qs = params.toString()
+  const path = qs ? `/api/dashboard-metrics?${qs}` : `/api/dashboard-metrics`
+  return client.requestRaw(path, {
+    headers: options.requestId ? { 'x-request-id': options.requestId } : undefined,
+  })
+}
+
 export async function parseDashboardMetrics(response: Response): Promise<DashboardMetricsResponse> {
   const json: unknown = await response.json()
   return dashboardMetricsSchema.parse(json)
