@@ -21,7 +21,16 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
 import { requestProductHealth } from '@/server/aguy-web'
-import { dashboardMetricsSchema } from '@/types/dashboard'
+import { productHealthSchema } from '@/types/dashboard'
+
+// Web returns the full dashboard payload; we only ship the productHealth
+// slice back to the client. Validating just the slice keeps this endpoint
+// insulated from schema drift in unrelated fields (tokens, revenue,
+// engagement) — a required-field addition in tokenMetrics shouldn't 502
+// the product-health refetch loop.
+const upstreamSliceSchema = z.object({
+  productHealth: productHealthSchema.optional(),
+})
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -79,7 +88,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       )
     }
 
-    const parsed = dashboardMetricsSchema.safeParse(await upstream.json())
+    const parsed = upstreamSliceSchema.safeParse(await upstream.json())
     if (!parsed.success) {
       console.error('Product health response validation failed', { requestId })
       return NextResponse.json(

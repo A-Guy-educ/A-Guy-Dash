@@ -86,6 +86,12 @@ export function ProductHealthSection({ productHealth: initial }: Props) {
   const [courseId, setCourseId] = useState<string | null>(null)
   const [granularity, setGranularity] = useState<ProductHealthGranularity>(autoGranularity('30d'))
 
+  // Seeded from `initial` on mount only. Subsequent shell refetches (e.g.
+  // manager flips the top-level Week/Month/Year picker) may deliver a
+  // fresh `initial` prop, but we intentionally ignore it: this tab owns
+  // its own filter cycle (range/course/granularity) that is orthogonal to
+  // the shell's period, and adopting the shell's default-filter slice
+  // would trample whatever range/course the manager has picked here.
   const [productHealth, setProductHealth] = useState<ProductHealth | undefined>(initial)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [hasError, setHasError] = useState(false)
