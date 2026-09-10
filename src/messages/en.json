@@ -22,13 +22,63 @@
     "loggingOut": "Logging out…",
     "adminOnlyTitle": "Admin access required",
     "adminOnlyBody": "Your account is not authorized to view this page.",
-    "period": { "week": "Week", "month": "Month", "year": "Year" },
+    "period": { "day": "Day", "week": "Week", "month": "Month", "year": "Year" },
     "tabs": {
+      "productHealth": "Product Health",
       "users": "Users",
       "content": "Content",
       "engagement": "Engagement",
       "tokens": "Tokens",
       "revenue": "Revenue"
+    },
+    "productHealth": {
+      "section": "Product Health",
+      "overviewTitle": "KPI Overview",
+      "trendsTitle": "KPI Trends",
+      "vsPrevious": "vs previous period",
+      "awaitingUpstream": "Aggregation not yet available upstream. Layout preview only — values will populate once Web ships the productHealth contract.",
+      "allCourses": "All courses",
+      "courseFilter": "Course filter",
+      "trendEmpty": "No data",
+      "valueLabel": "Value",
+      "numeratorLabel": "Numerator",
+      "denominatorLabel": "Denominator",
+      "na": "N/A",
+      "range": {
+        "7d": "Last 7 days",
+        "30d": "Last 30 days",
+        "90d": "Last 90 days",
+        "custom": "Custom",
+        "customStart": "Start date",
+        "customEnd": "End date"
+      },
+      "granularity": {
+        "daily": "Daily",
+        "weekly": "Weekly",
+        "monthly": "Monthly"
+      },
+      "metrics": {
+        "activeUserRate": {
+          "label": "Active User Rate",
+          "tooltip": "Active Users / All Identified Users × 100. Active = started a lesson and stayed >60s in that session."
+        },
+        "engagementRate": {
+          "label": "Engagement Rate",
+          "tooltip": "Engaged Users / Active Users × 100. Engaged = Active + held a chat conversation in the period."
+        },
+        "retentionRate": {
+          "label": "Retention Rate",
+          "tooltip": "Retained Users / Users Eligible for Retention × 100. Default: 30-day rolling window."
+        },
+        "inactiveChurnRate": {
+          "label": "Inactive / Churn Rate",
+          "tooltip": "Previously active users who became inactive / previously active × 100. A drop is an improvement."
+        },
+        "lessonCompletionRate": {
+          "label": "Lesson Completion Rate",
+          "tooltip": "Completed Lessons / Started Lessons × 100."
+        }
+      }
     },
     "tokens": {
       "section": "LLM token usage",

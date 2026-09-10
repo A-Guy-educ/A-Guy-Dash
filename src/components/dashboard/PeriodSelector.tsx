@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button'
 import { useTranslations } from '@/components/i18n'
 import type { Period } from '@/types/dashboard'
 
-const OPTIONS: readonly Period[] = ['week', 'month', 'year']
+const OPTIONS: readonly Period[] = ['day', 'week', 'month', 'year']
 
 interface PeriodSelectorProps {
   value: Period

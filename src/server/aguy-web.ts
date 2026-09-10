@@ -12,6 +12,8 @@ import {
 const DEFAULT_WEB_ORIGIN = 'https://www.aguy.co.il'
 const DEFAULT_API_ORIGIN = 'https://api.aguy.co.il'
 const DEFAULT_DASHBOARD_ORIGIN = 'https://dash.aguy.co.il'
+const DEFAULT_TEACHER_ORIGIN = 'https://teacher.aguy.co.il'
+const DEV_TEACHER_ORIGIN = 'https://teacher.dev.aguy.co.il'
 
 function configuredOrigin(value: string | undefined, fallback: string): URL {
   const url = new URL(value || fallback)
@@ -35,6 +37,16 @@ export function getDashboardOrigin(): URL {
   return configuredOrigin(process.env.DASHBOARD_PUBLIC_URL, DEFAULT_DASHBOARD_ORIGIN)
 }
 
+export function getTeacherOrigin(): URL {
+  if (process.env.AGUY_TEACHER_URL) {
+    return configuredOrigin(process.env.AGUY_TEACHER_URL, DEFAULT_TEACHER_ORIGIN)
+  }
+
+  return getDashboardOrigin().hostname.endsWith('.dev.aguy.co.il')
+    ? new URL(DEV_TEACHER_ORIGIN)
+    : new URL(DEFAULT_TEACHER_ORIGIN)
+}
+
 export function getLoginUrl(): string {
   const loginUrl = new URL('/login', getWebOrigin())
   loginUrl.searchParams.set('returnTo', `${getDashboardOrigin().origin}/`)
@@ -53,6 +65,44 @@ export async function requestDashboardMetrics(
   })
 
   return client.requestRaw(`/api/dashboard-metrics?period=${period}`, {
+    headers: options.requestId ? { 'x-request-id': options.requestId } : undefined,
+  })
+}
+
+/**
+ * Params forwarded to Web's `/api/dashboard-metrics` to shape the
+ * `productHealth` slice. All optional — Web defaults to range=30d, All
+ * Courses, daily. See A-Guy-Web PR #1187 for the accepted values.
+ */
+export interface ProductHealthQuery {
+  range?: string
+  start?: string
+  end?: string
+  courseId?: string
+  granularity?: string
+}
+
+export async function requestProductHealth(
+  cookieHeader: string | null,
+  query: ProductHealthQuery,
+  options: { fetcher?: typeof fetch; requestId?: string } = {},
+): Promise<Response> {
+  const client = createAguyApiClient({
+    baseUrl: getApiOrigin().origin,
+    cookie: cookieHeader,
+    fetch: options.fetcher,
+  })
+
+  const params = new URLSearchParams()
+  if (query.range) params.set('range', query.range)
+  if (query.start) params.set('start', query.start)
+  if (query.end) params.set('end', query.end)
+  if (query.courseId) params.set('courseId', query.courseId)
+  if (query.granularity) params.set('granularity', query.granularity)
+
+  const qs = params.toString()
+  const path = qs ? `/api/dashboard-metrics?${qs}` : `/api/dashboard-metrics`
+  return client.requestRaw(path, {
     headers: options.requestId ? { 'x-request-id': options.requestId } : undefined,
   })
 }

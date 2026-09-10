@@ -1,7 +1,39 @@
 import { z } from 'zod'
 
+const productHealthMetricSchema = z.object({
+  value: z.number().nullable(),
+  numerator: z.number().nullable(),
+  denominator: z.number().nullable(),
+  comparisonValue: z.number().nullable(),
+  deltaPp: z.number().nullable(),
+  trend: z.array(
+    z.object({
+      bucketStart: z.string(),
+      bucketEnd: z.string(),
+      value: z.number().nullable(),
+      numerator: z.number().nullable(),
+      denominator: z.number().nullable(),
+    }),
+  ),
+})
+
+export const productHealthSchema = z.object({
+  periodStart: z.string(),
+  periodEnd: z.string(),
+  courseId: z.string().nullable(),
+  granularity: z.enum(['daily', 'weekly', 'monthly']),
+  metrics: z.object({
+    activeUserRate: productHealthMetricSchema,
+    engagementRate: productHealthMetricSchema,
+    retentionRate: productHealthMetricSchema,
+    inactiveChurnRate: productHealthMetricSchema,
+    lessonCompletionRate: productHealthMetricSchema,
+  }),
+  availableCourses: z.array(z.object({ id: z.string(), title: z.string() })),
+})
+
 export const dashboardMetricsSchema = z.object({
-  period: z.enum(['week', 'month', 'year']),
+  period: z.enum(['day', 'week', 'month', 'year']),
   userMetrics: z.object({
     activeUsersToday: z.number(),
     activeUsersYesterday: z.number(),
@@ -87,6 +119,10 @@ export const dashboardMetricsSchema = z.object({
     successRate: z.number(),
     topProducts: z.array(z.object({ productName: z.string(), agorot: z.number() })),
   }),
+  // Optional — Web may ship the aggregation after Dash. Missing field
+  // degrades the Product Health tab to an "awaiting upstream" empty state
+  // instead of failing the entire dashboard load.
+  productHealth: productHealthSchema.optional(),
   tokenMetrics: z.object({
     totalTokensToday: z.number(),
     totalTokensThisMonth: z.number(),

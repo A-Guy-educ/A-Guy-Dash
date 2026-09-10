@@ -5,7 +5,17 @@ import { AppShell, ThemeProvider, applyLocale, type Locale } from '@a-guy/ui'
 import { useTranslations } from '@/components/i18n'
 import { LogoutButton } from '@/components/logout-button'
 
-export function AppChrome({ children, locale }: { children: React.ReactNode; locale: Locale }) {
+export function AppChrome({
+  children,
+  locale,
+  teacherOrigin,
+  webOrigin,
+}: {
+  children: React.ReactNode
+  locale: Locale
+  teacherOrigin: string
+  webOrigin: string
+}) {
   const t = useTranslations('shell')
 
   function changeLocale(nextLocale: Locale) {
@@ -21,14 +31,15 @@ export function AppChrome({ children, locale }: { children: React.ReactNode; loc
       <AppShell
         actions={<LogoutButton />}
         appName={t('appName')}
+        brandHref={`${webOrigin}/`}
         footer={t('footer')}
         locale={locale}
         localeLabels={{ en: 'English', he: 'עברית' }}
         menuLabel={t('menu')}
         navItems={[
           { href: '/', label: t('dashboard'), current: true },
-          { href: 'https://www.aguy.co.il/', label: t('web') },
-          { href: 'https://teacher.aguy.co.il/', label: t('teacher') },
+          { href: `${webOrigin}/`, label: t('web') },
+          { href: `${teacherOrigin}/`, label: t('teacher') },
         ]}
         onLocaleChange={changeLocale}
         skipLabel={t('skip')}
