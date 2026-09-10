@@ -45,12 +45,23 @@ interface Props {
   initialData: DashboardMetricsResponse
 }
 
+// The Product Health tab has its own Date Range / Course / Granularity
+// controls (spec §5) and deliberately ignores the shell-level period
+// picker. Rendering the picker while on that tab is misleading — it
+// looks like it should do something but doesn't. So we hide the picker
+// and the "Period: X" sub-line whenever this tab is active and let the
+// tab-owned filters carry the whole story.
+const TABS_WITHOUT_PERIOD = new Set(['productHealth'])
+
 export function DashboardShell({ initialData }: Props) {
   const t = useTranslations('dashboard')
   const [period, setPeriod] = useState<Period>(initialData.period)
   const [data, setData] = useState<DashboardMetricsResponse>(initialData)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [hasError, setHasError] = useState(false)
+  const [activeTab, setActiveTab] = useState('productHealth')
+
+  const showPeriodPicker = !TABS_WITHOUT_PERIOD.has(activeTab)
 
   const fetchForPeriod = useCallback(async (next: Period) => {
     setIsRefreshing(true)
@@ -83,12 +94,16 @@ export function DashboardShell({ initialData }: Props) {
       <header className="flex items-center justify-between flex-wrap gap-content-gap">
         <div>
           <h1 className="text-heading-2xl font-bold">{t('title')}</h1>
-          <p className="text-body-sm text-muted-foreground mt-1">
-            {t('periodLabel')}: {t(`period.${data.period}`)}
-            {isRefreshing && <span className="ml-2 italic">{t('refreshing')}</span>}
-          </p>
+          {showPeriodPicker && (
+            <p className="text-body-sm text-muted-foreground mt-1">
+              {t('periodLabel')}: {t(`period.${data.period}`)}
+              {isRefreshing && <span className="ml-2 italic">{t('refreshing')}</span>}
+            </p>
+          )}
         </div>
-        <PeriodSelector value={period} onChange={setPeriod} disabled={isRefreshing} />
+        {showPeriodPicker && (
+          <PeriodSelector value={period} onChange={setPeriod} disabled={isRefreshing} />
+        )}
       </header>
 
       {hasError && (
@@ -109,7 +124,7 @@ export function DashboardShell({ initialData }: Props) {
         </div>
       )}
 
-      <Tabs defaultValue="productHealth" className="space-y-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList>
           <TabsTrigger value="productHealth">{t('tabs.productHealth')}</TabsTrigger>
           <TabsTrigger value="users">{t('tabs.users')}</TabsTrigger>
