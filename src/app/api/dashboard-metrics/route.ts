@@ -25,11 +25,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   }
 
   try {
-    const upstream = await requestDashboardMetrics(
-      request.headers.get('cookie'),
-      period.data,
-      { requestId },
-    )
+    const upstream = await requestDashboardMetrics(request.headers.get('cookie'), period.data, {
+      requestId,
+    })
 
     if (!upstream.ok) {
       return NextResponse.json(
