@@ -20,8 +20,10 @@ describe('dashboard metrics proxy', () => {
     expect(requestDashboardMetrics).not.toHaveBeenCalled()
   })
 
-  it('forwards day as month upstream and echoes day back to the client', async () => {
-    requestDashboardMetrics.mockResolvedValue(Response.json(dashboardFixture()))
+  it('forwards day upstream verbatim', async () => {
+    requestDashboardMetrics.mockResolvedValue(
+      Response.json({ ...dashboardFixture(), period: 'day' }),
+    )
     const { GET } = await import('./route')
 
     const response = await GET(
@@ -31,7 +33,7 @@ describe('dashboard metrics proxy', () => {
     expect(response.status).toBe(200)
     expect(requestDashboardMetrics).toHaveBeenCalledWith(
       null,
-      'month',
+      'day',
       expect.objectContaining({ requestId: expect.any(String) }),
     )
     const body = (await response.json()) as { period: string }
