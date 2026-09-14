@@ -2,6 +2,14 @@
 
 All notable changes to A-Guy-Dash are documented here. Follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## v0.3.1 — 2026-09-14
+
+Removes the `day → month` upstream shim from the `/api/dashboard-metrics` proxy route now that Web accepts `period=day` natively (Web PR #1187, tests locked in via Web PR #1204). The Day tab of the Users view now reflects today's actual signup-source breakdown instead of month-to-date attribution.
+
+### Refactor
+
+- Remove the `upstreamPeriodFor` day→month rewrite and the echoed-period override from the dashboard-metrics proxy — Web now aggregates `signupSourceBreakdown` over the current day so buckets sum to `registeredToday`.
+
 ## v0.3.0 — 2026-09-10
 
 Adds the Product Health tab (Spec v0.2) and expands period filtering to include a `day` bucket. Introduces the `/api/product-health` proxy route and widens Dash's Zod schema for the new `productHealth` block, kept `.optional()` so a missing Web-side payload degrades to an "awaiting upstream" state instead of failing the entire dashboard load.
