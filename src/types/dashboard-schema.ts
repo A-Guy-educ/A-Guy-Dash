@@ -17,17 +17,40 @@ const productHealthMetricSchema = z.object({
   ),
 })
 
+// Count-metric shape for Total New Registered Users (spec v0.4 §C). Distinct
+// from the rate shape: no numerator/denominator, no pp delta — the delta is
+// an absolute count difference between the current and prior windows.
+const productHealthCountMetricSchema = z.object({
+  value: z.number().nullable(),
+  comparisonValue: z.number().nullable(),
+  deltaAbs: z.number().nullable(),
+  trend: z.array(
+    z.object({
+      bucketStart: z.string(),
+      bucketEnd: z.string(),
+      value: z.number().nullable(),
+    }),
+  ),
+})
+
 export const productHealthSchema = z.object({
   periodStart: z.string(),
   periodEnd: z.string(),
   courseId: z.string().nullable(),
   granularity: z.enum(['daily', 'weekly', 'monthly']),
+  // v0.4 top KPI. Optional during Web rollout — Dash may ship before Web
+  // populates the field, in which case the card renders "N/A" instead of
+  // failing the whole payload.
+  totalNewRegisteredUsers: productHealthCountMetricSchema.optional(),
   metrics: z.object({
     activeUserRate: productHealthMetricSchema,
     engagementRate: productHealthMetricSchema,
     retentionRate: productHealthMetricSchema,
     inactiveChurnRate: productHealthMetricSchema,
-    lessonCompletionRate: productHealthMetricSchema,
+    // v0.4 replacements for lessonCompletionRate. Optional during Web
+    // rollout for the same reason as totalNewRegisteredUsers.
+    pdfScrollUsabilityRate: productHealthMetricSchema.optional(),
+    chatUsabilityRate: productHealthMetricSchema.optional(),
   }),
   availableCourses: z.array(z.object({ id: z.string(), title: z.string() })),
 })

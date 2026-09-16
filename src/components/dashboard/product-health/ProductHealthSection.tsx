@@ -1,6 +1,7 @@
 /**
- * Product Health tab (Spec v0.2, Tab 1). Renders the KPI Overview + KPI
- * Trends blocks for the five product-health rates.
+ * Product Health tab (Spec v0.4, Tab 1). Renders the top count KPI
+ * (Total New Registered Users), the KPI Overview grid of six rate cards,
+ * and paired trend charts.
  *
  * Data flow: the initial payload comes from the shell's server-rendered
  * fetch (`data.productHealth`). Subsequent filter changes hit the
@@ -16,7 +17,7 @@
  * @fileType component
  * @domain dashboard
  * @pattern container
- * @ai-summary Product Health tab — five KPI cards + five trend charts + filters + fetch
+ * @ai-summary Product Health tab — count + rate KPI cards, trend charts, filters, fetch
  */
 
 'use client'
@@ -34,6 +35,7 @@ import type {
 } from '@/types/dashboard'
 import { PRODUCT_HEALTH_METRIC_KEYS } from '@/types/dashboard'
 
+import { CountKpiCard } from './CountKpiCard'
 import { CourseFilter, DateRangeSelector, GranularityToggle } from './Filters'
 import { KpiCard } from './KpiCard'
 import { TrendLineChart } from './TrendLineChart'
@@ -152,11 +154,17 @@ export function ProductHealthSection({ productHealth: initial }: Props) {
         key,
         metric: productHealth?.metrics[key],
         label: t(`metrics.${key}.label`),
-        tooltip: t(`metrics.${key}.tooltip`),
+        formula: t(`metrics.${key}.formula`),
+        absoluteLabelTemplate: t(`metrics.${key}.absoluteLabel`),
         invert: INVERTED_METRICS.has(key),
       })),
     [productHealth, t],
   )
+
+  const countMetric = productHealth?.totalNewRegisteredUsers
+  const countLabel = t('metrics.totalNewRegisteredUsers.label')
+  const countFormula = t('metrics.totalNewRegisteredUsers.formula')
+  const countSublabel = t('metrics.totalNewRegisteredUsers.sublabel')
 
   return (
     <section className="space-y-6">
@@ -213,18 +221,34 @@ export function ProductHealthSection({ productHealth: initial }: Props) {
         </div>
       )}
 
-      {/* KPI Overview — five rate cards. Column layout matches the spec
+      {/* Top count KPI (spec v0.4 §C) — Total New Registered Users. Sits
+          above the rate grid because it's the only whole-count card and
+          shouldn't fight the 3-across rate layout for column alignment. */}
+      <div>
+        <CountKpiCard
+          label={countLabel}
+          value={countMetric?.value ?? null}
+          deltaAbs={countMetric?.deltaAbs ?? null}
+          formula={countFormula}
+          sublabel={countSublabel}
+        />
+      </div>
+
+      {/* KPI Overview — six rate cards. Column layout matches the spec
           wireframe (3 across, 2 in the second row on wide screens). */}
       <div>
         <h3 className="text-heading-md font-semibold mb-3">{t('overviewTitle')}</h3>
         <div className="grid gap-content-gap grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-          {kpiEntries.map(({ key, metric, label, tooltip, invert }) => (
+          {kpiEntries.map(({ key, metric, label, formula, absoluteLabelTemplate, invert }) => (
             <KpiCard
               key={key}
               label={label}
               value={metric?.value ?? null}
+              numerator={metric?.numerator ?? null}
+              denominator={metric?.denominator ?? null}
               deltaPp={metric?.deltaPp ?? null}
-              tooltip={tooltip}
+              formula={formula}
+              absoluteLabelTemplate={absoluteLabelTemplate}
               invertDelta={invert}
             />
           ))}

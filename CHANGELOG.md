@@ -2,6 +2,14 @@
 
 All notable changes to A-Guy-Dash are documented here. Follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## v0.4.0 — 2026-09-16
+
+Implements the Product Health spec v0.4 updates: adds a `Total New Registered Users` count KPI as the top card, replaces `lessonCompletionRate` with two lesson-type usability rates (`pdfScrollUsabilityRate`, `chatUsabilityRate`), and introduces per-card formula tooltips. All new schema fields are `.optional()` so Dash can ship ahead of the Web-side producer — missing fields degrade to per-card "N/A" instead of failing the whole payload.
+
+### Features
+
+- Implement Product Health v0.4 spec (#25) — new `CountKpiCard` for `totalNewRegisteredUsers` with absolute-count delta, two lesson-usability rate cards replacing `lessonCompletionRate`, and a shared `FormulaTooltip` that surfaces each KPI's numerator/denominator formula on hover.
+
 ## v0.3.1 — 2026-09-14
 
 Removes the `day → month` upstream shim from the `/api/dashboard-metrics` proxy route now that Web accepts `period=day` natively (Web PR #1187, tests locked in via Web PR #1204). The Day tab of the Users view now reflects today's actual signup-source breakdown instead of month-to-date attribution.

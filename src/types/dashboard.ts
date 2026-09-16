@@ -167,20 +167,27 @@ export interface TokenMetrics {
 }
 
 /**
- * Product Health tab (Tab 1) — Spec v0.2. Five rate KPIs with paired trend
- * lines. Every metric surfaces `numerator` + `denominator` so weekly/monthly
- * buckets can be recomputed rather than averaged (Section 4 of the spec).
+ * Product Health tab (Tab 1) — Spec v0.4. Rate KPIs with paired trend lines
+ * plus a top count KPI. Every rate metric surfaces `numerator` + `denominator`
+ * so weekly/monthly buckets can be recomputed rather than averaged (baseline
+ * §4) and so cards can render the supporting absolute values (v0.4 §C).
  *
- * The whole block is optional: Web owns the aggregation and may ship the
- * field after Dash. When the field is absent the UI renders an "awaiting
- * upstream" state instead of failing the entire response validation.
+ * v0.4 replaced `lessonCompletionRate` with two lesson-type usability rates
+ * (§D) and added `totalNewRegisteredUsers` as a top count KPI (§C). The new
+ * fields are marked optional so a Dash deploy that lands before Web has
+ * populated them degrades to per-card "N/A" rather than failing validation.
+ *
+ * The whole block is optional at the response level: Web owns the aggregation
+ * and may ship the field after Dash. When the field is absent the UI renders
+ * an "awaiting upstream" state instead of failing the entire response.
  */
 export const PRODUCT_HEALTH_METRIC_KEYS = [
   'activeUserRate',
   'engagementRate',
   'retentionRate',
   'inactiveChurnRate',
-  'lessonCompletionRate',
+  'pdfScrollUsabilityRate',
+  'chatUsabilityRate',
 ] as const
 
 export type ProductHealthMetricKey = (typeof PRODUCT_HEALTH_METRIC_KEYS)[number]
@@ -205,6 +212,19 @@ export interface ProductHealthMetric {
   trend: ProductHealthTrendBucket[]
 }
 
+export interface ProductHealthCountTrendBucket {
+  bucketStart: string
+  bucketEnd: string
+  value: number | null
+}
+
+export interface ProductHealthCountMetric {
+  value: number | null
+  comparisonValue: number | null
+  deltaAbs: number | null
+  trend: ProductHealthCountTrendBucket[]
+}
+
 export interface ProductHealthCourseOption {
   id: string
   title: string
@@ -215,7 +235,15 @@ export interface ProductHealth {
   periodEnd: string
   courseId: string | null
   granularity: ProductHealthGranularity
-  metrics: Record<ProductHealthMetricKey, ProductHealthMetric>
+  totalNewRegisteredUsers?: ProductHealthCountMetric
+  metrics: {
+    activeUserRate: ProductHealthMetric
+    engagementRate: ProductHealthMetric
+    retentionRate: ProductHealthMetric
+    inactiveChurnRate: ProductHealthMetric
+    pdfScrollUsabilityRate?: ProductHealthMetric
+    chatUsabilityRate?: ProductHealthMetric
+  }
   availableCourses: ProductHealthCourseOption[]
 }
 
