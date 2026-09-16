@@ -58,25 +58,40 @@
         "monthly": "Monthly"
       },
       "metrics": {
+        "totalNewRegisteredUsers": {
+          "label": "Total New Registered Users",
+          "sublabel": "New identified registrations in the selected date range",
+          "formula": "COUNT(DISTINCT user_id) where registration_completed occurs in the selected date range."
+        },
         "activeUserRate": {
           "label": "Active User Rate",
-          "tooltip": "Active Users / All Identified Users × 100. Active = started a lesson and stayed >60s in that session."
+          "formula": "Distinct Active Users / All Identified Users × 100.\n\nActive = the user entered a lesson and satisfied its lesson-type rule: PDF/Scroll = ≥1 scroll event and stayed ≥60s in the same lesson; Chat/Interactive = answered ≥5 items in the same lesson.",
+          "absoluteLabel": "{numerator} active users out of {denominator} identified users"
         },
         "engagementRate": {
           "label": "Engagement Rate",
-          "tooltip": "Engaged Users / Active Users × 100. Engaged = Active + held a chat conversation in the period."
+          "formula": "Distinct Engaged Users / Distinct Active Users × 100.\n\nEngaged = Active + in the same lesson either stayed >5 min or asked the chat ≥1 question. A chat-only user who is not Active does not count as Engaged.",
+          "absoluteLabel": "{numerator} engaged users out of {denominator} active users"
         },
         "retentionRate": {
           "label": "Retention Rate",
-          "tooltip": "Retained Users / Users Eligible for Retention × 100. Default: 30-day rolling window."
+          "formula": "Retained Users / Users Eligible for Retention × 100.\n\nDefault: 30-day rolling retention — user was Active in the prior window and became Active again in the current window.",
+          "absoluteLabel": "{numerator} retained users out of {denominator} eligible users"
         },
         "inactiveChurnRate": {
           "label": "Inactive / Churn Rate",
-          "tooltip": "Previously active users who became inactive / previously active × 100. A drop is an improvement."
+          "formula": "Previously Active Users Who Became Inactive / Previously Active Users × 100.\n\nA drop reads as an improvement.",
+          "absoluteLabel": "{numerator} churned users out of {denominator} previously active users"
         },
-        "lessonCompletionRate": {
-          "label": "Lesson Completion Rate",
-          "tooltip": "Completed Lessons / Started Lessons × 100."
+        "pdfScrollUsabilityRate": {
+          "label": "PDF / Scroll Lesson Usability Rate",
+          "formula": "PDF/Scroll lesson entries with ≥1 scroll event / Total entered PDF/Scroll lesson instances × 100.\n\nMeasures meaningful initial use, not completion.",
+          "absoluteLabel": "{numerator} out of {denominator} PDF / scroll lesson instances had a scroll event"
+        },
+        "chatUsabilityRate": {
+          "label": "Chat Lesson Usability Rate",
+          "formula": "Chat/Interactive lesson entries with ≥5 answered items / Total entered Chat/Interactive lesson instances × 100.\n\nMeasures meaningful initial use, not completion.",
+          "absoluteLabel": "{numerator} out of {denominator} chat lesson instances had ≥5 answered items"
         }
       }
     },

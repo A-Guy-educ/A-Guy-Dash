@@ -14,6 +14,12 @@ function productHealthFixture(): ProductHealth {
     periodEnd: '2026-09-09',
     courseId: null,
     granularity: 'daily',
+    totalNewRegisteredUsers: {
+      value: 1280,
+      comparisonValue: 1235,
+      deltaAbs: 45,
+      trend: [],
+    },
     metrics: {
       activeUserRate: {
         value: 64.2,
@@ -47,12 +53,20 @@ function productHealthFixture(): ProductHealth {
         deltaPp: -2.5,
         trend: [],
       },
-      lessonCompletionRate: {
-        value: 37.4,
-        numerator: 220,
-        denominator: 588,
-        comparisonValue: 32.4,
-        deltaPp: 5.0,
+      pdfScrollUsabilityRate: {
+        value: 71.0,
+        numerator: 355,
+        denominator: 500,
+        comparisonValue: 64.7,
+        deltaPp: 6.3,
+        trend: [],
+      },
+      chatUsabilityRate: {
+        value: 46.2,
+        numerator: 92,
+        denominator: 200,
+        comparisonValue: 41.5,
+        deltaPp: 4.7,
         trend: [],
       },
     },
