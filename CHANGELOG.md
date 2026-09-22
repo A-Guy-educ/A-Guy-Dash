@@ -2,6 +2,14 @@
 
 All notable changes to A-Guy-Dash are documented here. Follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## v0.4.1 — 2026-09-22
+
+Two follow-ups to the v0.4 Product Health release. The `FormulaTooltip` and `TrendLineChart` tooltips were using `bg-popover` / `text-popover-foreground` classes that were never mapped in the tailwind config, so tooltips rendered transparent and blended into the card content behind them — swapped to `bg-foreground text-background` for a high-contrast inverted tooltip in both themes. Also narrows the Active User Rate formula copy from "All Identified Users" (lifetime user base) to "Distinct Signed-in Users in Period" (users with a session in the selected date range); this is copy-only on Dash — the matching numerator/denominator change on Web's `/api/dashboard-metrics` is a separate coordination item.
+
+### Bug Fixes
+
+- Fix Product Health tooltip contrast and rescope Active User Rate denominator copy (#28).
+
 ## v0.4.0 — 2026-09-16
 
 Implements the Product Health spec v0.4 updates: adds a `Total New Registered Users` count KPI as the top card, replaces `lessonCompletionRate` with two lesson-type usability rates (`pdfScrollUsabilityRate`, `chatUsabilityRate`), and introduces per-card formula tooltips. All new schema fields are `.optional()` so Dash can ship ahead of the Web-side producer — missing fields degrade to per-card "N/A" instead of failing the whole payload.
