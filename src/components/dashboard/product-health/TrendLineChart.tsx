@@ -192,7 +192,7 @@ export function TrendLineChart({ data, ariaLabel }: TrendLineChartProps) {
       {hovered && hovered.bucket.value !== null && (
         <div
           role="tooltip"
-          className="pointer-events-none absolute z-20 -translate-x-1/2 -translate-y-full rounded-md border border-border bg-popover px-2 py-1 text-body-xs text-popover-foreground shadow-md whitespace-pre-line"
+          className="pointer-events-none absolute z-20 -translate-x-1/2 -translate-y-full rounded-md bg-foreground px-2 py-1 text-body-xs text-background shadow-lg whitespace-pre-line"
           style={{ left: `${tooltipLeftPct}%`, top: `calc(${tooltipTopPct}% - 6px)` }}
         >
           {`${formatBucketRange(hovered.bucket, locale)}\n${t('valueLabel')}: ${hovered.bucket.value.toFixed(1)}%\n${t('numeratorLabel')}: ${hovered.bucket.numerator ?? '—'}\n${t('denominatorLabel')}: ${hovered.bucket.denominator ?? '—'}`}
