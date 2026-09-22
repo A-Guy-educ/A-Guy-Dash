@@ -50,7 +50,7 @@ export function FormulaTooltip({ children, content, className }: FormulaTooltipP
         <span
           id={id}
           role="tooltip"
-          className="absolute left-0 top-full z-20 mt-1 w-max max-w-xs whitespace-pre-line rounded-md border border-border bg-popover px-3 py-2 text-body-xs font-normal normal-case tracking-normal text-popover-foreground shadow-md"
+          className="absolute left-0 top-full z-20 mt-1 w-max max-w-xs whitespace-pre-line rounded-md bg-foreground px-3 py-2 text-body-xs font-normal normal-case tracking-normal text-background shadow-lg"
         >
           {content}
         </span>
