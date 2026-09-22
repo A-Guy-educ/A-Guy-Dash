@@ -65,8 +65,8 @@
         },
         "activeUserRate": {
           "label": "Active User Rate",
-          "formula": "Distinct Active Users / All Identified Users × 100.\n\nActive = the user entered a lesson and satisfied its lesson-type rule: PDF/Scroll = ≥1 scroll event and stayed ≥60s in the same lesson; Chat/Interactive = answered ≥5 items in the same lesson.",
-          "absoluteLabel": "{numerator} active users out of {denominator} identified users"
+          "formula": "Distinct Active Users / Distinct Signed-in Users in Period × 100.\n\nDenominator is scoped to users who had at least one session in the selected date range — not the lifetime user base. Active = the user entered a lesson and satisfied its lesson-type rule: PDF/Scroll = ≥1 scroll event and stayed ≥60s in the same lesson; Chat/Interactive = answered ≥5 items in the same lesson.",
+          "absoluteLabel": "{numerator} active users out of {denominator} users who signed in during the period"
         },
         "engagementRate": {
           "label": "Engagement Rate",
