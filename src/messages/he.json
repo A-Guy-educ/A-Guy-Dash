@@ -124,10 +124,6 @@
       "activeLastWeek": "שבוע שעבר",
       "activeLastMonth": "חודש שעבר",
       "guestSection": "סשנים של אורחים",
-      "guestTotal": "סה״כ",
-      "guestToday": "היום",
-      "guestLastWeek": "שבוע שעבר",
-      "guestLastMonth": "חודש שעבר",
       "converted": "הומרו",
       "conversion": "המרה",
       "guestPeriod": {
@@ -136,7 +132,6 @@
         "month": "אורחים, חודש אחרון",
         "year": "אורחים, 12 חודשים אחרונים"
       },
-      "guestAllTime": "מאז ומעולם",
       "returningSection": "חוזרים",
       "returningInPeriod": "חזרו בתקופה",
       "returningHintPrefix": "מתוך",

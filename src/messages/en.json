@@ -124,10 +124,6 @@
       "activeLastWeek": "Last week",
       "activeLastMonth": "Last month",
       "guestSection": "Guest sessions",
-      "guestTotal": "Total",
-      "guestToday": "Today",
-      "guestLastWeek": "Last week",
-      "guestLastMonth": "Last month",
       "converted": "Converted",
       "conversion": "Conversion",
       "guestPeriod": {
@@ -136,7 +132,6 @@
         "month": "Guests, last month",
         "year": "Guests, last 12 months"
       },
-      "guestAllTime": "All time",
       "returningSection": "Returning",
       "returningInPeriod": "Returning in period",
       "returningHintPrefix": "out of",

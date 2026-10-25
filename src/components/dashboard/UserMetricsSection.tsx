@@ -43,11 +43,18 @@ export function UserMetricsSection({ metrics, period }: Props) {
   const showRegisteredGranular = period !== 'year'
   const showActiveSection = period !== 'year'
 
-  // Guest tile follows the period picker when Web sends the period cohort;
-  // all-time totals drop to a hint so they don't read as the period number.
-  const periodGuests = metrics.guestSessionsInPeriod
-  const periodConverted = metrics.guestConvertedInPeriod
-  const allTimeGuestHint = `${t('guestAllTime')}: ${metrics.guestToRegisteredPercentage}% (${metrics.guestToRegisteredCount.toLocaleString(locale)} / ${metrics.totalGuestSessions.toLocaleString(locale)})`
+  // Guest tile is period-only — no all-time cards. Prefer Web's rolling
+  // period cohort; until Web ships it, fall back to the legacy bucket for the
+  // count and hide converted / conversion (only available all-time).
+  const legacyGuests: Record<Period, number | undefined> = {
+    day: metrics.guestSessionsToday,
+    week: metrics.guestSessionsLastWeek,
+    month: metrics.guestSessionsLastMonth,
+    year: undefined,
+  }
+  const periodGuests = metrics.guestSessionsInPeriod ?? legacyGuests[period]
+  const periodConverted =
+    metrics.guestSessionsInPeriod !== undefined ? metrics.guestConvertedInPeriod : undefined
 
   return (
     <section className="space-y-6">
@@ -144,36 +151,18 @@ export function UserMetricsSection({ metrics, period }: Props) {
             <CardTitle className="text-heading-md">{t('guestSection')}</CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            {periodGuests !== undefined && periodConverted !== undefined ? (
-              <div className="grid gap-content-gap grid-cols-2 md:grid-cols-3">
-                <MetricCard label={t(`guestPeriod.${period}`)} value={periodGuests} />
-                <MetricCard label={t('converted')} value={periodConverted} />
-                <MetricCard
-                  label={t('conversion')}
-                  value={formatPercent(percentOf(periodConverted, periodGuests))}
-                  hint={allTimeGuestHint}
-                />
-              </div>
-            ) : (
-              <div className="grid gap-content-gap grid-cols-2 md:grid-cols-3">
-                <MetricCard label={t('guestTotal')} value={metrics.totalGuestSessions} />
-                {period === 'day' && (
-                  <MetricCard label={t('guestToday')} value={metrics.guestSessionsToday} />
-                )}
-                {period === 'week' && (
-                  <MetricCard label={t('guestLastWeek')} value={metrics.guestSessionsLastWeek} />
-                )}
-                {period === 'month' && (
-                  <MetricCard label={t('guestLastMonth')} value={metrics.guestSessionsLastMonth} />
-                )}
-                <MetricCard label={t('converted')} value={metrics.guestToRegisteredCount} />
-                <MetricCard
-                  label={t('conversion')}
-                  value={metrics.guestToRegisteredPercentage}
-                  suffix="%"
-                />
-              </div>
-            )}
+            <div className="grid gap-content-gap grid-cols-2 md:grid-cols-3">
+              <MetricCard label={t(`guestPeriod.${period}`)} value={periodGuests ?? '—'} />
+              {periodConverted !== undefined && (
+                <>
+                  <MetricCard label={t('converted')} value={periodConverted} />
+                  <MetricCard
+                    label={t('conversion')}
+                    value={formatPercent(percentOf(periodConverted, periodGuests ?? 0))}
+                  />
+                </>
+              )}
+            </div>
           </CardContent>
         </Card>
 
