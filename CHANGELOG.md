@@ -2,6 +2,19 @@
 
 All notable changes to A-Guy-Dash are documented here. Follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## v0.5.0 — 2026-10-25
+
+Guest-funnel release for the Users tab. Adds a Guest Insights section (landing-source breakdown, top landing paths and referrers, onboarding funnel, conversion by landing type, bot traffic) and makes the guest tile follow the period picker. Both depend on fields from Web PR #1465 (`guestInsights`, `guestSessionsInPeriod`, `guestConvertedInPeriod`); every new schema field is defaulted, so against a Web prod without #1465 the section renders an empty state and the guest tile shows the legacy period count without conversion cards, rather than failing the dashboard.
+
+### Features
+
+- Guest insights — landing source, onboarding funnel, bots (#31).
+- Guest tile follows the period picker (#33).
+
+### Refactor
+
+- Guest tile is period-only; drop the all-time cards (#33).
+
 ## v0.4.1 — 2026-09-22
 
 Two follow-ups to the v0.4 Product Health release. The `FormulaTooltip` and `TrendLineChart` tooltips were using `bg-popover` / `text-popover-foreground` classes that were never mapped in the tailwind config, so tooltips rendered transparent and blended into the card content behind them — swapped to `bg-foreground text-background` for a high-contrast inverted tooltip in both themes. Also narrows the Active User Rate formula copy from "All Identified Users" (lifetime user base) to "Distinct Signed-in Users in Period" (users with a session in the selected date range); this is copy-only on Dash — the matching numerator/denominator change on Web's `/api/dashboard-metrics` is a separate coordination item.

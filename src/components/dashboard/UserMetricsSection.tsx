@@ -20,6 +20,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useLocale, useTranslations } from '@/components/i18n'
 import type { Period, UserMetrics } from '@/types/dashboard'
+import { formatPercent, percentOf } from './guest-insights-math'
 import { MetricCard } from './MetricCard'
 import { SignupSourceBreakdownCard } from './SignupSourceBreakdownCard'
 import { TrendBadge } from './TrendBadge'
@@ -41,6 +42,19 @@ export function UserMetricsSection({ metrics, period }: Props) {
   // sibling by DashboardShell) for the 12-month roll-up.
   const showRegisteredGranular = period !== 'year'
   const showActiveSection = period !== 'year'
+
+  // Guest tile is period-only — no all-time cards. Prefer Web's rolling
+  // period cohort; until Web ships it, fall back to the legacy bucket for the
+  // count and hide converted / conversion (only available all-time).
+  const legacyGuests: Record<Period, number | undefined> = {
+    day: metrics.guestSessionsToday,
+    week: metrics.guestSessionsLastWeek,
+    month: metrics.guestSessionsLastMonth,
+    year: undefined,
+  }
+  const periodGuests = metrics.guestSessionsInPeriod ?? legacyGuests[period]
+  const periodConverted =
+    metrics.guestSessionsInPeriod !== undefined ? metrics.guestConvertedInPeriod : undefined
 
   return (
     <section className="space-y-6">
@@ -138,22 +152,16 @@ export function UserMetricsSection({ metrics, period }: Props) {
           </CardHeader>
           <CardContent className="pt-0">
             <div className="grid gap-content-gap grid-cols-2 md:grid-cols-3">
-              <MetricCard label={t('guestTotal')} value={metrics.totalGuestSessions} />
-              {period === 'day' && (
-                <MetricCard label={t('guestToday')} value={metrics.guestSessionsToday} />
+              <MetricCard label={t(`guestPeriod.${period}`)} value={periodGuests ?? '—'} />
+              {periodConverted !== undefined && (
+                <>
+                  <MetricCard label={t('converted')} value={periodConverted} />
+                  <MetricCard
+                    label={t('conversion')}
+                    value={formatPercent(percentOf(periodConverted, periodGuests ?? 0))}
+                  />
+                </>
               )}
-              {period === 'week' && (
-                <MetricCard label={t('guestLastWeek')} value={metrics.guestSessionsLastWeek} />
-              )}
-              {period === 'month' && (
-                <MetricCard label={t('guestLastMonth')} value={metrics.guestSessionsLastMonth} />
-              )}
-              <MetricCard label={t('converted')} value={metrics.guestToRegisteredCount} />
-              <MetricCard
-                label={t('conversion')}
-                value={metrics.guestToRegisteredPercentage}
-                suffix="%"
-              />
             </div>
           </CardContent>
         </Card>

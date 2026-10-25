@@ -42,6 +42,13 @@ export interface UserMetrics {
   guestSessionsLastMonth: number
   guestToRegisteredCount: number
   guestToRegisteredPercentage: number
+  /**
+   * Guests created since `periodStart` (rolling window matching the period
+   * picker) and how many of that cohort later signed up. Optional until Web
+   * ships them; absent → the tile shows the legacy all-time cards.
+   */
+  guestSessionsInPeriod?: number
+  guestConvertedInPeriod?: number
   returnedOnceCount: number
   returnedOncePercentage: number
   returnedMultipleCount: number
@@ -247,6 +254,71 @@ export interface ProductHealth {
   availableCourses: ProductHealthCourseOption[]
 }
 
+/**
+ * Guest insights (Web PR #1465) — where anonymous visitors land, how far they
+ * get through onboarding, and how many look like bots. Only guest sessions
+ * created after #1465 deployed are counted, so totals lag `userMetrics` guest
+ * counts during the first month. "Last 30d" is a rolling now−30d window.
+ *
+ * Funnel steps are NOT monotonic: lesson/course pages show the Google prompt
+ * directly (skipping persona + grade), so `signupPromptShown` can exceed
+ * `gradeSelected`. Every step is ≤ `started`.
+ *
+ * Bot numbers are two different things: `uaBotHitsLast30d` are page loads by
+ * UA-identified bots that never became guest sessions; `unconfirmedLast30d`
+ * are real guest sessions that never ran the client beacon (possible bots).
+ */
+export type LandingType = 'lesson' | 'course' | 'start' | 'home' | 'other'
+
+export type LandingBreakdown = Record<LandingType, number>
+
+export interface TopLandingPath {
+  path: string
+  type: LandingType
+  count: number
+}
+
+export interface TopReferrer {
+  host: string
+  count: number
+}
+
+export interface OnboardingFunnel {
+  started: number
+  personaSelected: number
+  gradeSelected: number
+  signupPromptShown: number
+  googleClicked: number
+  completed: number
+}
+
+export interface GuestConversionBucket {
+  guests: number
+  converted: number
+}
+
+export interface GuestBotMetrics {
+  uaBotHitsLast30d: {
+    search: number
+    socialPreview: number
+    aiCrawler: number
+    other: number
+  }
+  guestSessionsLast30d: number
+  jsConfirmedLast30d: number
+  unconfirmedLast30d: number
+}
+
+export interface GuestInsights {
+  landingBreakdown: LandingBreakdown
+  landingBreakdownLast30d: LandingBreakdown
+  topLandingPaths: TopLandingPath[]
+  topReferrers: TopReferrer[]
+  onboardingFunnel: OnboardingFunnel
+  conversionByLandingType: Record<LandingType, GuestConversionBucket>
+  bots: GuestBotMetrics
+}
+
 export interface DashboardMetricsResponse {
   period: Period
   userMetrics: UserMetrics
@@ -256,6 +328,12 @@ export interface DashboardMetricsResponse {
   revenueMetrics: RevenueMetrics
   tokenMetrics: TokenMetrics
   productHealth?: ProductHealth
+  guestInsights: GuestInsights
 }
 
-export { dashboardMetricsSchema, productHealthSchema } from './dashboard-schema'
+export {
+  dashboardMetricsSchema,
+  guestInsightsSchema,
+  LANDING_TYPES,
+  productHealthSchema,
+} from './dashboard-schema'

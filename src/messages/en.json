@@ -124,12 +124,14 @@
       "activeLastWeek": "Last week",
       "activeLastMonth": "Last month",
       "guestSection": "Guest sessions",
-      "guestTotal": "Total",
-      "guestToday": "Today",
-      "guestLastWeek": "Last week",
-      "guestLastMonth": "Last month",
       "converted": "Converted",
       "conversion": "Conversion",
+      "guestPeriod": {
+        "day": "Guests today",
+        "week": "Guests, last 7 days",
+        "month": "Guests, last month",
+        "year": "Guests, last 12 months"
+      },
       "returningSection": "Returning",
       "returningInPeriod": "Returning in period",
       "returningHintPrefix": "out of",
@@ -147,6 +149,71 @@
         "direct": "Direct",
         "other": "Other",
         "unknown": "Unknown"
+      }
+    },
+    "guestInsights": {
+      "section": "Guest insights",
+      "trackingSince": "Tracking since",
+      "trackingSinceRelease": "Counts only guests since tracking started (lower than the guest totals above for the first month)",
+      "emptyState": "No data yet",
+      "ranges": {
+        "last30d": "Last 30 days",
+        "allTime": "All time"
+      },
+      "landingTypes": {
+        "lesson": "Lesson",
+        "course": "Course",
+        "start": "/start",
+        "home": "Home",
+        "other": "Other"
+      },
+      "landing": {
+        "title": "Where guests land",
+        "barAriaLabel": "Guest landing page breakdown",
+        "topPaths": "Top landing pages",
+        "topReferrers": "Top referrers",
+        "noReferrers": "No external referrers",
+        "listsWindow": "Top lists cover the last 30 days."
+      },
+      "conversion": {
+        "title": "Conversion by landing page",
+        "landing": "Landing",
+        "guests": "Guests",
+        "converted": "Signed up",
+        "rate": "Rate",
+        "window": "All time since tracking started."
+      },
+      "funnel": {
+        "title": "Onboarding funnel (last 30 days)",
+        "reachedSignupButLeft": "Reached sign-up but left",
+        "clickedGoogleButLeft": "Clicked Google but didn't finish",
+        "ofPromptShown": "of guests shown sign-up",
+        "ofGoogleClicked": "of Google clicks",
+        "steps": {
+          "started": "Started onboarding",
+          "personaSelected": "Picked teacher persona",
+          "gradeSelected": "Picked grade",
+          "signupPromptShown": "Shown sign-up",
+          "googleClicked": "Clicked Google",
+          "completed": "Signed up"
+        },
+        "note": "% of guests who started. Lesson and course pages go straight to sign-up, skipping persona and grade, so steps don't always shrink in order."
+      },
+      "bots": {
+        "title": "Bots (last 30 days)",
+        "uaHits": "Bot page loads",
+        "categories": {
+          "search": "Search engines",
+          "socialPreview": "Link previews",
+          "aiCrawler": "AI crawlers",
+          "other": "Other bots"
+        },
+        "uaHitsNote": "Identified by user agent. These were never counted as guests.",
+        "guestSessions": "Guest sessions",
+        "splitAriaLabel": "Confirmed vs unconfirmed guest sessions",
+        "jsConfirmed": "Confirmed browser",
+        "unconfirmed": "Unconfirmed / possible bots",
+        "sessionsNote": "Unconfirmed sessions never ran the in-page check. They may be bots, or people who left before the page loaded."
       }
     },
     "content": {
