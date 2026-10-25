@@ -55,6 +55,63 @@ export const productHealthSchema = z.object({
   availableCourses: z.array(z.object({ id: z.string(), title: z.string() })),
 })
 
+// Guest insights (Web PR #1465). Every level defaults to zeros / [] so an
+// older Web deploy without the field — or a partial nested object — renders
+// an empty state instead of 502-ing the dashboard. zod 4 `.default()` skips
+// parsing the fallback, so objects use `.prefault({})` to fill nested keys.
+const count = z.number().default(0)
+
+export const LANDING_TYPES = ['lesson', 'course', 'start', 'home', 'other'] as const
+// Unknown landing types from a newer Web fold into 'other' rather than
+// failing the whole payload.
+const landingTypeSchema = z.enum(LANDING_TYPES).catch('other')
+
+const landingBreakdownSchema = z
+  .object({ lesson: count, course: count, start: count, home: count, other: count })
+  .prefault({})
+
+const conversionBucketSchema = z.object({ guests: count, converted: count }).prefault({})
+
+export const guestInsightsSchema = z
+  .object({
+    landingBreakdown: landingBreakdownSchema,
+    landingBreakdownLast30d: landingBreakdownSchema,
+    topLandingPaths: z
+      .array(z.object({ path: z.string(), type: landingTypeSchema, count }))
+      .default([]),
+    topReferrers: z.array(z.object({ host: z.string(), count })).default([]),
+    onboardingFunnel: z
+      .object({
+        started: count,
+        personaSelected: count,
+        gradeSelected: count,
+        signupPromptShown: count,
+        googleClicked: count,
+        completed: count,
+      })
+      .prefault({}),
+    conversionByLandingType: z
+      .object({
+        lesson: conversionBucketSchema,
+        course: conversionBucketSchema,
+        start: conversionBucketSchema,
+        home: conversionBucketSchema,
+        other: conversionBucketSchema,
+      })
+      .prefault({}),
+    bots: z
+      .object({
+        uaBotHitsLast30d: z
+          .object({ search: count, socialPreview: count, aiCrawler: count, other: count })
+          .prefault({}),
+        guestSessionsLast30d: count,
+        jsConfirmedLast30d: count,
+        unconfirmedLast30d: count,
+      })
+      .prefault({}),
+  })
+  .prefault({})
+
 export const dashboardMetricsSchema = z.object({
   period: z.enum(['day', 'week', 'month', 'year']),
   userMetrics: z.object({
@@ -146,6 +203,7 @@ export const dashboardMetricsSchema = z.object({
   // degrades the Product Health tab to an "awaiting upstream" empty state
   // instead of failing the entire dashboard load.
   productHealth: productHealthSchema.optional(),
+  guestInsights: guestInsightsSchema,
   tokenMetrics: z.object({
     totalTokensToday: z.number(),
     totalTokensThisMonth: z.number(),

@@ -149,6 +149,71 @@
         "unknown": "לא ידוע"
       }
     },
+    "guestInsights": {
+      "section": "תובנות על אורחים",
+      "trackingSince": "נמדד מאז",
+      "trackingSinceRelease": "כולל רק אורחים מאז שהמדידה התחילה (בחודש הראשון יהיה נמוך מסה״כ האורחים למעלה)",
+      "emptyState": "אין נתונים עדיין",
+      "ranges": {
+        "last30d": "30 יום אחרונים",
+        "allTime": "מאז ומעולם"
+      },
+      "landingTypes": {
+        "lesson": "שיעור",
+        "course": "קורס",
+        "start": "/start",
+        "home": "דף הבית",
+        "other": "אחר"
+      },
+      "landing": {
+        "title": "לאן אורחים מגיעים",
+        "barAriaLabel": "פילוח דפי נחיתה של אורחים",
+        "topPaths": "דפי נחיתה מובילים",
+        "topReferrers": "מקורות הפניה מובילים",
+        "noReferrers": "אין הפניות חיצוניות",
+        "listsWindow": "הרשימות מתייחסות ל-30 הימים האחרונים."
+      },
+      "conversion": {
+        "title": "המרה לפי דף נחיתה",
+        "landing": "נחיתה",
+        "guests": "אורחים",
+        "converted": "נרשמו",
+        "rate": "שיעור",
+        "window": "מאז שהמדידה התחילה."
+      },
+      "funnel": {
+        "title": "משפך אונבורדינג (30 יום אחרונים)",
+        "reachedSignupButLeft": "הגיעו להרשמה ועזבו",
+        "clickedGoogleButLeft": "לחצו על גוגל ולא סיימו",
+        "ofPromptShown": "מהאורחים שהוצגה להם הרשמה",
+        "ofGoogleClicked": "מהלחיצות על גוגל",
+        "steps": {
+          "started": "התחילו אונבורדינג",
+          "personaSelected": "בחרו פרסונת מורה",
+          "gradeSelected": "בחרו כיתה",
+          "signupPromptShown": "הוצגה הרשמה",
+          "googleClicked": "לחצו על גוגל",
+          "completed": "נרשמו"
+        },
+        "note": "באחוזים מתוך מי שהתחיל. דפי שיעור וקורס מדלגים על פרסונה וכיתה ועוברים ישר להרשמה, ולכן השלבים לא תמיד יורדים לפי הסדר."
+      },
+      "bots": {
+        "title": "בוטים (30 יום אחרונים)",
+        "uaHits": "טעינות דף של בוטים",
+        "categories": {
+          "search": "מנועי חיפוש",
+          "socialPreview": "תצוגות מקדימות של קישורים",
+          "aiCrawler": "סורקי AI",
+          "other": "בוטים אחרים"
+        },
+        "uaHitsNote": "זוהו לפי user agent. לא נספרו כאורחים.",
+        "guestSessions": "סשנים של אורחים",
+        "splitAriaLabel": "סשנים מאומתים מול לא מאומתים",
+        "jsConfirmed": "דפדפן מאומת",
+        "unconfirmed": "לא מאומת / אולי בוט",
+        "sessionsNote": "סשנים לא מאומתים לא הריצו את הבדיקה בדף. ייתכן שהם בוטים, או אנשים שעזבו לפני שהדף נטען."
+      }
+    },
     "content": {
       "section": "ספריית תוכן",
       "courses": "קורסים",
