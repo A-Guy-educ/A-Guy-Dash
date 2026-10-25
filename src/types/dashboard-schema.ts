@@ -132,6 +132,11 @@ export const dashboardMetricsSchema = z.object({
     guestSessionsLastMonth: z.number(),
     guestToRegisteredCount: z.number(),
     guestToRegisteredPercentage: z.number(),
+    // Period-scoped guest cohort (created since `periodStart`, same rolling
+    // window as the rest of the Users tab). Optional until Web ships it —
+    // the guest tile falls back to the legacy all-time cards when absent.
+    guestSessionsInPeriod: z.number().optional(),
+    guestConvertedInPeriod: z.number().optional(),
     returnedOnceCount: z.number(),
     returnedOncePercentage: z.number(),
     returnedMultipleCount: z.number(),

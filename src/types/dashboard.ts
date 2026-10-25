@@ -42,6 +42,13 @@ export interface UserMetrics {
   guestSessionsLastMonth: number
   guestToRegisteredCount: number
   guestToRegisteredPercentage: number
+  /**
+   * Guests created since `periodStart` (rolling window matching the period
+   * picker) and how many of that cohort later signed up. Optional until Web
+   * ships them; absent → the tile shows the legacy all-time cards.
+   */
+  guestSessionsInPeriod?: number
+  guestConvertedInPeriod?: number
   returnedOnceCount: number
   returnedOncePercentage: number
   returnedMultipleCount: number
