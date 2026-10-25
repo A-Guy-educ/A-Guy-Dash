@@ -71,5 +71,35 @@ export function dashboardFixture(): DashboardMetricsResponse {
       topLessons: [],
       topUsers: [],
     },
+    guestInsights: {
+      landingBreakdown: { lesson: 40, course: 25, start: 20, home: 10, other: 5 },
+      landingBreakdownLast30d: { lesson: 20, course: 10, start: 8, home: 4, other: 2 },
+      topLandingPaths: [
+        { path: '/courses/math/chapters/1/lessons/2', type: 'lesson', count: 9 },
+        { path: '/start', type: 'start', count: 8 },
+      ],
+      topReferrers: [{ host: 'whatsapp.com', count: 11 }],
+      onboardingFunnel: {
+        started: 30,
+        personaSelected: 18,
+        gradeSelected: 15,
+        signupPromptShown: 24,
+        googleClicked: 12,
+        completed: 8,
+      },
+      conversionByLandingType: {
+        lesson: { guests: 40, converted: 6 },
+        course: { guests: 25, converted: 3 },
+        start: { guests: 20, converted: 4 },
+        home: { guests: 10, converted: 1 },
+        other: { guests: 5, converted: 0 },
+      },
+      bots: {
+        uaBotHitsLast30d: { search: 120, socialPreview: 30, aiCrawler: 45, other: 5 },
+        guestSessionsLast30d: 44,
+        jsConfirmedLast30d: 38,
+        unconfirmedLast30d: 6,
+      },
+    },
   }
 }

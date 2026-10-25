@@ -34,6 +34,7 @@ import type { DashboardMetricsResponse, Period } from '@/types/dashboard'
 
 import { ContentCountsSection } from './ContentCountsSection'
 import { EngagementSection } from './EngagementSection'
+import { GuestInsightsSection } from './GuestInsightsSection'
 import { MonthlySignupsSection } from './MonthlySignupsSection'
 import { PeriodSelector } from './PeriodSelector'
 import { ProductHealthSection } from './product-health/ProductHealthSection'
@@ -140,6 +141,7 @@ export function DashboardShell({ initialData }: Props) {
 
         <TabsContent value="users" className="space-y-8">
           <UserMetricsSection metrics={data.userMetrics} period={data.period} />
+          <GuestInsightsSection insights={data.guestInsights} />
           <MonthlySignupsSection months={data.monthlySignups} />
         </TabsContent>
 
