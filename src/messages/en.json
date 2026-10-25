@@ -130,6 +130,13 @@
       "guestLastMonth": "Last month",
       "converted": "Converted",
       "conversion": "Conversion",
+      "guestPeriod": {
+        "day": "Guests today",
+        "week": "Guests, last 7 days",
+        "month": "Guests, last month",
+        "year": "Guests, last 12 months"
+      },
+      "guestAllTime": "All time",
       "returningSection": "Returning",
       "returningInPeriod": "Returning in period",
       "returningHintPrefix": "out of",

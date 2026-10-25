@@ -91,6 +91,23 @@ describe('guestInsights schema', () => {
   })
 })
 
+describe('period-scoped guest fields', () => {
+  it('stays undefined when Web omits them', () => {
+    const parsed = dashboardMetricsSchema.parse(dashboardFixture())
+    expect(parsed.userMetrics.guestSessionsInPeriod).toBeUndefined()
+    expect(parsed.userMetrics.guestConvertedInPeriod).toBeUndefined()
+  })
+
+  it('passes them through when present', () => {
+    const fixture = dashboardFixture()
+    fixture.userMetrics.guestSessionsInPeriod = 50
+    fixture.userMetrics.guestConvertedInPeriod = 4
+    const parsed = dashboardMetricsSchema.parse(fixture)
+    expect(parsed.userMetrics.guestSessionsInPeriod).toBe(50)
+    expect(parsed.userMetrics.guestConvertedInPeriod).toBe(4)
+  })
+})
+
 describe('guest insights math', () => {
   it('guards percentages against a zero denominator', () => {
     expect(percentOf(3, 0)).toBeNull()

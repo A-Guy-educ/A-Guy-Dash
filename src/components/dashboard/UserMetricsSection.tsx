@@ -20,6 +20,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useLocale, useTranslations } from '@/components/i18n'
 import type { Period, UserMetrics } from '@/types/dashboard'
+import { formatPercent, percentOf } from './guest-insights-math'
 import { MetricCard } from './MetricCard'
 import { SignupSourceBreakdownCard } from './SignupSourceBreakdownCard'
 import { TrendBadge } from './TrendBadge'
@@ -41,6 +42,12 @@ export function UserMetricsSection({ metrics, period }: Props) {
   // sibling by DashboardShell) for the 12-month roll-up.
   const showRegisteredGranular = period !== 'year'
   const showActiveSection = period !== 'year'
+
+  // Guest tile follows the period picker when Web sends the period cohort;
+  // all-time totals drop to a hint so they don't read as the period number.
+  const periodGuests = metrics.guestSessionsInPeriod
+  const periodConverted = metrics.guestConvertedInPeriod
+  const allTimeGuestHint = `${t('guestAllTime')}: ${metrics.guestToRegisteredPercentage}% (${metrics.guestToRegisteredCount.toLocaleString(locale)} / ${metrics.totalGuestSessions.toLocaleString(locale)})`
 
   return (
     <section className="space-y-6">
@@ -137,24 +144,36 @@ export function UserMetricsSection({ metrics, period }: Props) {
             <CardTitle className="text-heading-md">{t('guestSection')}</CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="grid gap-content-gap grid-cols-2 md:grid-cols-3">
-              <MetricCard label={t('guestTotal')} value={metrics.totalGuestSessions} />
-              {period === 'day' && (
-                <MetricCard label={t('guestToday')} value={metrics.guestSessionsToday} />
-              )}
-              {period === 'week' && (
-                <MetricCard label={t('guestLastWeek')} value={metrics.guestSessionsLastWeek} />
-              )}
-              {period === 'month' && (
-                <MetricCard label={t('guestLastMonth')} value={metrics.guestSessionsLastMonth} />
-              )}
-              <MetricCard label={t('converted')} value={metrics.guestToRegisteredCount} />
-              <MetricCard
-                label={t('conversion')}
-                value={metrics.guestToRegisteredPercentage}
-                suffix="%"
-              />
-            </div>
+            {periodGuests !== undefined && periodConverted !== undefined ? (
+              <div className="grid gap-content-gap grid-cols-2 md:grid-cols-3">
+                <MetricCard label={t(`guestPeriod.${period}`)} value={periodGuests} />
+                <MetricCard label={t('converted')} value={periodConverted} />
+                <MetricCard
+                  label={t('conversion')}
+                  value={formatPercent(percentOf(periodConverted, periodGuests))}
+                  hint={allTimeGuestHint}
+                />
+              </div>
+            ) : (
+              <div className="grid gap-content-gap grid-cols-2 md:grid-cols-3">
+                <MetricCard label={t('guestTotal')} value={metrics.totalGuestSessions} />
+                {period === 'day' && (
+                  <MetricCard label={t('guestToday')} value={metrics.guestSessionsToday} />
+                )}
+                {period === 'week' && (
+                  <MetricCard label={t('guestLastWeek')} value={metrics.guestSessionsLastWeek} />
+                )}
+                {period === 'month' && (
+                  <MetricCard label={t('guestLastMonth')} value={metrics.guestSessionsLastMonth} />
+                )}
+                <MetricCard label={t('converted')} value={metrics.guestToRegisteredCount} />
+                <MetricCard
+                  label={t('conversion')}
+                  value={metrics.guestToRegisteredPercentage}
+                  suffix="%"
+                />
+              </div>
+            )}
           </CardContent>
         </Card>
 

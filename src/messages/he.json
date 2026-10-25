@@ -130,6 +130,13 @@
       "guestLastMonth": "חודש שעבר",
       "converted": "הומרו",
       "conversion": "המרה",
+      "guestPeriod": {
+        "day": "אורחים היום",
+        "week": "אורחים, 7 ימים אחרונים",
+        "month": "אורחים, חודש אחרון",
+        "year": "אורחים, 12 חודשים אחרונים"
+      },
+      "guestAllTime": "מאז ומעולם",
       "returningSection": "חוזרים",
       "returningInPeriod": "חזרו בתקופה",
       "returningHintPrefix": "מתוך",
