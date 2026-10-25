@@ -3,6 +3,8 @@ updates:
   # npm dependencies
   - package-ecosystem: 'npm'
     directory: '/'
+    # Feature work lands on dev; dev -> main is promoted by the release skill
+    target-branch: 'dev'
     schedule:
       interval: 'weekly'
       day: 'monday'
@@ -42,10 +44,18 @@ updates:
         update-types: ['version-update:semver-major']
       - dependency-name: '@payloadcms/*'
         update-types: ['version-update:semver-major']
+      # Must track the Node runtime major (22), not latest
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
+      # Major is coupled to the next major, which is held above
+      - dependency-name: 'eslint-config-next'
+        update-types: ['version-update:semver-major']
 
   # Docker dependencies (if docker-compose.yml exists)
   - package-ecosystem: 'docker'
     directory: '/'
+    # Feature work lands on dev; dev -> main is promoted by the release skill
+    target-branch: 'dev'
     schedule:
       interval: 'weekly'
       day: 'monday'
@@ -56,6 +66,8 @@ updates:
   # GitHub Actions
   - package-ecosystem: 'github-actions'
     directory: '/'
+    # Feature work lands on dev; dev -> main is promoted by the release skill
+    target-branch: 'dev'
     schedule:
       interval: 'weekly'
       day: 'monday'
