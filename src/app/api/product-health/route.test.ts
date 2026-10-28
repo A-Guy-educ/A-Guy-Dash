@@ -13,7 +13,10 @@ function productHealthFixture(): ProductHealth {
     periodStart: '2026-08-10',
     periodEnd: '2026-09-09',
     courseId: null,
+    grade: null,
     granularity: 'daily',
+    activeDwellSeconds: 60,
+    activityDataSince: '2026-08-10',
     totalNewRegisteredUsers: {
       value: 1280,
       comparisonValue: 1235,
@@ -61,16 +64,9 @@ function productHealthFixture(): ProductHealth {
         deltaPp: 6.3,
         trend: [],
       },
-      chatUsabilityRate: {
-        value: 46.2,
-        numerator: 92,
-        denominator: 200,
-        comparisonValue: 41.5,
-        deltaPp: 4.7,
-        trend: [],
-      },
     },
     availableCourses: [{ id: 'a'.repeat(24), title: 'Course A' }],
+    availableGrades: ['ט', 'י', 'יא'],
   }
 }
 
@@ -97,6 +93,16 @@ describe('product-health proxy', () => {
     expect(requestProductHealth).not.toHaveBeenCalled()
   })
 
+  it('rejects an out-of-range activeDwellSeconds', async () => {
+    const { GET } = await import('./route')
+    const response = await GET(
+      new NextRequest('https://dash.aguy.co.il/api/product-health?activeDwellSeconds=0'),
+    )
+
+    expect(response.status).toBe(400)
+    expect(requestProductHealth).not.toHaveBeenCalled()
+  })
+
   it('rejects a non-hex courseId', async () => {
     const { GET } = await import('./route')
     const response = await GET(
@@ -115,14 +121,21 @@ describe('product-health proxy', () => {
     const { GET } = await import('./route')
 
     const response = await GET(
-      new NextRequest('https://dash.aguy.co.il/api/product-health?range=7d&granularity=daily'),
+      new NextRequest(
+        'https://dash.aguy.co.il/api/product-health?range=7d&granularity=daily&grade=%D7%99%D7%90&activeDwellSeconds=300',
+      ),
     )
 
     expect(response.status).toBe(200)
     expect(response.headers.get('cache-control')).toBe('no-store')
     expect(requestProductHealth).toHaveBeenCalledWith(
       null,
-      expect.objectContaining({ range: '7d', granularity: 'daily' }),
+      expect.objectContaining({
+        range: '7d',
+        granularity: 'daily',
+        grade: 'יא',
+        activeDwellSeconds: 300,
+      }),
       expect.objectContaining({ requestId: expect.any(String) }),
     )
     expect(await response.json()).toEqual(ph)

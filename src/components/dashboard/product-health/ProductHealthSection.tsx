@@ -36,7 +36,13 @@ import type {
 import { PRODUCT_HEALTH_METRIC_KEYS } from '@/types/dashboard'
 
 import { CountKpiCard } from './CountKpiCard'
-import { CourseFilter, DateRangeSelector, GranularityToggle } from './Filters'
+import {
+  ActiveThresholdSelector,
+  CourseFilter,
+  DateRangeSelector,
+  GradeFilter,
+  GranularityToggle,
+} from './Filters'
 import { KpiCard } from './KpiCard'
 import { TrendLineChart } from './TrendLineChart'
 
@@ -47,6 +53,8 @@ interface Props {
 // Only Inactive/Churn reads "positive" when it drops (spec §3). Kept as a Set
 // so the KpiCard call-site is a one-liner.
 const INVERTED_METRICS: ReadonlySet<ProductHealthMetricKey> = new Set(['inactiveChurnRate'])
+
+const DEFAULT_ACTIVE_DWELL_SECONDS = 60
 
 // Auto-select granularity from range width (spec §4).
 function autoGranularity(range: ProductHealthDateRange): ProductHealthGranularity {
@@ -60,6 +68,8 @@ interface Query {
   range: ProductHealthDateRange
   granularity: ProductHealthGranularity
   courseId: string | null
+  grade: string | null
+  activeDwellSeconds: number
   start: string
   end: string
 }
@@ -75,6 +85,12 @@ function buildQueryString(q: Query): string | null {
     params.set('end', q.end)
   }
   if (q.courseId) params.set('courseId', q.courseId)
+  if (q.grade) params.set('grade', q.grade)
+  // 60s is Web's default — omit it so the default query matches the shell's
+  // server-rendered slice.
+  if (q.activeDwellSeconds !== DEFAULT_ACTIVE_DWELL_SECONDS) {
+    params.set('activeDwellSeconds', String(q.activeDwellSeconds))
+  }
   return params.toString()
 }
 
@@ -86,6 +102,8 @@ export function ProductHealthSection({ productHealth: initial }: Props) {
   const [customStart, setCustomStart] = useState('')
   const [customEnd, setCustomEnd] = useState('')
   const [courseId, setCourseId] = useState<string | null>(null)
+  const [grade, setGrade] = useState<string | null>(null)
+  const [activeDwellSeconds, setActiveDwellSeconds] = useState(DEFAULT_ACTIVE_DWELL_SECONDS)
   const [granularity, setGranularity] = useState<ProductHealthGranularity>(autoGranularity('30d'))
 
   // Seeded from `initial` on mount only. Subsequent shell refetches (e.g.
@@ -98,7 +116,15 @@ export function ProductHealthSection({ productHealth: initial }: Props) {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [hasError, setHasError] = useState(false)
 
-  const query: Query = { range, granularity, courseId, start: customStart, end: customEnd }
+  const query: Query = {
+    range,
+    granularity,
+    courseId,
+    grade,
+    activeDwellSeconds,
+    start: customStart,
+    end: customEnd,
+  }
   const queryKey = buildQueryString(query)
 
   const abortRef = useRef<AbortController | null>(null)
@@ -147,6 +173,8 @@ export function ProductHealthSection({ productHealth: initial }: Props) {
   }
 
   const courses = productHealth?.availableCourses ?? []
+  const grades = productHealth?.availableGrades ?? []
+  const dataSince = productHealth?.activityDataSince ?? null
 
   const kpiEntries = useMemo(
     () =>
@@ -191,6 +219,19 @@ export function ProductHealthSection({ productHealth: initial }: Props) {
             options={courses}
             disabled={isRefreshing}
           />
+          {grades.length > 0 && (
+            <GradeFilter
+              value={grade}
+              onChange={setGrade}
+              options={grades}
+              disabled={isRefreshing}
+            />
+          )}
+          <ActiveThresholdSelector
+            value={activeDwellSeconds}
+            onChange={setActiveDwellSeconds}
+            disabled={isRefreshing}
+          />
         </div>
       </div>
 
@@ -210,6 +251,15 @@ export function ProductHealthSection({ productHealth: initial }: Props) {
             {tShell('retry')}
           </Button>
         </div>
+      )}
+
+      {/* Visit-level KPIs only exist from the dwell log's first full day
+          (Web PR #1504); earlier windows come back null. Say so instead of
+          leaving the manager to guess why cards read N/A. */}
+      {dataSince && (
+        <p className="text-body-sm text-muted-foreground">
+          {t('dataSince').replace('{date}', dataSince)}
+        </p>
       )}
 
       {!productHealth && !hasError && (
