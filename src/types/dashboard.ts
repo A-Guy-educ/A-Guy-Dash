@@ -187,6 +187,11 @@ export interface TokenMetrics {
  * The whole block is optional at the response level: Web owns the aggregation
  * and may ship the field after Dash. When the field is absent the UI renders
  * an "awaiting upstream" state instead of failing the entire response.
+ *
+ * Web PR #1504 moved every visit-based KPI onto a per-visit dwell log.
+ * Windows that start before the log's first full day come back `null`;
+ * `activityDataSince` tells the UI when that history begins. Chat usability
+ * was never shipped (interactive lessons are retired), so it is not rendered.
  */
 export const PRODUCT_HEALTH_METRIC_KEYS = [
   'activeUserRate',
@@ -194,7 +199,6 @@ export const PRODUCT_HEALTH_METRIC_KEYS = [
   'retentionRate',
   'inactiveChurnRate',
   'pdfScrollUsabilityRate',
-  'chatUsabilityRate',
 ] as const
 
 export type ProductHealthMetricKey = (typeof PRODUCT_HEALTH_METRIC_KEYS)[number]
@@ -241,7 +245,10 @@ export interface ProductHealth {
   periodStart: string
   periodEnd: string
   courseId: string | null
+  grade?: string | null
   granularity: ProductHealthGranularity
+  activeDwellSeconds?: number
+  activityDataSince?: string | null
   totalNewRegisteredUsers?: ProductHealthCountMetric
   metrics: {
     activeUserRate: ProductHealthMetric
@@ -249,9 +256,9 @@ export interface ProductHealth {
     retentionRate: ProductHealthMetric
     inactiveChurnRate: ProductHealthMetric
     pdfScrollUsabilityRate?: ProductHealthMetric
-    chatUsabilityRate?: ProductHealthMetric
   }
   availableCourses: ProductHealthCourseOption[]
+  availableGrades?: string[]
 }
 
 /**

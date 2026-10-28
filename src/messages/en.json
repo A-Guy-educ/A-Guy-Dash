@@ -22,7 +22,12 @@
     "loggingOut": "Logging out…",
     "adminOnlyTitle": "Admin access required",
     "adminOnlyBody": "Your account is not authorized to view this page.",
-    "period": { "day": "Day", "week": "Week", "month": "Month", "year": "Year" },
+    "period": {
+      "day": "Day",
+      "week": "Week",
+      "month": "Month",
+      "year": "Year"
+    },
     "tabs": {
       "productHealth": "Product Health",
       "users": "Users",
@@ -39,6 +44,15 @@
       "awaitingUpstream": "Aggregation not yet available upstream. Layout preview only — values will populate once Web ships the productHealth contract.",
       "allCourses": "All courses",
       "courseFilter": "Course filter",
+      "allGrades": "All grades",
+      "gradeFilter": "Grade filter",
+      "dataSince": "Visit-level data is collected from {date}. Earlier windows read N/A; Retention and Churn need twice the selected period of history.",
+      "activeThreshold": {
+        "60": "≥1 min",
+        "300": "≥5 min",
+        "600": "≥10 min",
+        "label": "Active ="
+      },
       "trendEmpty": "No data",
       "valueLabel": "Value",
       "numeratorLabel": "Numerator",
@@ -65,33 +79,28 @@
         },
         "activeUserRate": {
           "label": "Active User Rate",
-          "formula": "Distinct Active Users / Distinct Signed-in Users in Period × 100.\n\nDenominator is scoped to users who had at least one session in the selected date range — not the lifetime user base. Active = the user entered a lesson and satisfied its lesson-type rule: PDF/Scroll = ≥1 scroll event and stayed ≥60s in the same lesson; Chat/Interactive = answered ≥5 items in the same lesson.",
+          "formula": "Distinct Active Users / Distinct Users Present in Period × 100.\n\nPresent = opened at least one lesson in the selected range (bounces included). Active = had at least one PDF lesson visit in the range with dwell ≥ the selected threshold (default 60s). Dwell is measured per visit, not summed across visits.",
           "absoluteLabel": "{numerator} active users out of {denominator} users who signed in during the period"
         },
         "engagementRate": {
           "label": "Engagement Rate",
-          "formula": "Distinct Engaged Users / Distinct Active Users × 100.\n\nEngaged = Active + in the same lesson either stayed >5 min or asked the chat ≥1 question. A chat-only user who is not Active does not count as Engaged.",
+          "formula": "Distinct Engaged Users / Distinct Active Users × 100.\n\nEngaged = Active + asked the chat at least one question in the same period.",
           "absoluteLabel": "{numerator} engaged users out of {denominator} active users"
         },
         "retentionRate": {
           "label": "Retention Rate",
-          "formula": "Retained Users / Users Eligible for Retention × 100.\n\nDefault: 30-day rolling retention — user was Active in the prior window and became Active again in the current window.",
+          "formula": "Retained Users / Users Active in the Prior Window × 100.\n\nThe prior window has the same length as the selected range (Last 7 days → users Active 14–7 days ago who were Active again in the last 7 days).",
           "absoluteLabel": "{numerator} retained users out of {denominator} eligible users"
         },
         "inactiveChurnRate": {
           "label": "Inactive / Churn Rate",
-          "formula": "Previously Active Users Who Became Inactive / Previously Active Users × 100.\n\nA drop reads as an improvement.",
+          "formula": "Users Active in the Prior Window Who Were Not Active Again / Users Active in the Prior Window × 100.\n\nSame prior window as Retention, so the two add up to 100%. A drop reads as an improvement.",
           "absoluteLabel": "{numerator} churned users out of {denominator} previously active users"
         },
         "pdfScrollUsabilityRate": {
           "label": "PDF / Scroll Lesson Usability Rate",
           "formula": "PDF/Scroll lesson entries with ≥1 scroll event / Total entered PDF/Scroll lesson instances × 100.\n\nMeasures meaningful initial use, not completion.",
           "absoluteLabel": "{numerator} out of {denominator} PDF / scroll lesson instances had a scroll event"
-        },
-        "chatUsabilityRate": {
-          "label": "Chat Lesson Usability Rate",
-          "formula": "Chat/Interactive lesson entries with ≥5 answered items / Total entered Chat/Interactive lesson instances × 100.\n\nMeasures meaningful initial use, not completion.",
-          "absoluteLabel": "{numerator} out of {denominator} chat lesson instances had ≥5 answered items"
         }
       }
     },
@@ -224,7 +233,9 @@
       "formulaSheets": "Formula sheets",
       "prompts": "Prompts"
     },
-    "monthly": { "section": "Signups by month (last 12)" },
+    "monthly": {
+      "section": "Signups by month (last 12)"
+    },
     "engagement": {
       "section": "Engagement",
       "avgSession": "Avg session",

@@ -37,7 +37,11 @@ export const productHealthSchema = z.object({
   periodStart: z.string(),
   periodEnd: z.string(),
   courseId: z.string().nullable(),
+  // Web PR #1504 additions — optional so an older Web deploy still parses.
+  grade: z.string().nullable().optional(),
   granularity: z.enum(['daily', 'weekly', 'monthly']),
+  activeDwellSeconds: z.number().optional(),
+  activityDataSince: z.string().nullable().optional(),
   // v0.4 top KPI. Optional during Web rollout — Dash may ship before Web
   // populates the field, in which case the card renders "N/A" instead of
   // failing the whole payload.
@@ -50,9 +54,9 @@ export const productHealthSchema = z.object({
     // v0.4 replacements for lessonCompletionRate. Optional during Web
     // rollout for the same reason as totalNewRegisteredUsers.
     pdfScrollUsabilityRate: productHealthMetricSchema.optional(),
-    chatUsabilityRate: productHealthMetricSchema.optional(),
   }),
   availableCourses: z.array(z.object({ id: z.string(), title: z.string() })),
+  availableGrades: z.array(z.string()).optional(),
 })
 
 // Guest insights (Web PR #1465). Every level defaults to zeros / [] so an
