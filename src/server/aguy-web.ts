@@ -72,13 +72,16 @@ export async function requestDashboardMetrics(
 /**
  * Params forwarded to Web's `/api/dashboard-metrics` to shape the
  * `productHealth` slice. All optional — Web defaults to range=30d, All
- * Courses, daily. See A-Guy-Web PR #1187 for the accepted values.
+ * Courses, All Grades, 60s Active threshold, daily. See A-Guy-Web PRs #1187
+ * and #1504 for the accepted values.
  */
 export interface ProductHealthQuery {
   range?: string
   start?: string
   end?: string
   courseId?: string
+  grade?: string
+  activeDwellSeconds?: number
   granularity?: string
 }
 
@@ -98,6 +101,8 @@ export async function requestProductHealth(
   if (query.start) params.set('start', query.start)
   if (query.end) params.set('end', query.end)
   if (query.courseId) params.set('courseId', query.courseId)
+  if (query.grade) params.set('grade', query.grade)
+  if (query.activeDwellSeconds) params.set('activeDwellSeconds', String(query.activeDwellSeconds))
   if (query.granularity) params.set('granularity', query.granularity)
 
   const qs = params.toString()

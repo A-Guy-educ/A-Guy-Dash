@@ -47,6 +47,8 @@ const querySchema = z
       .string()
       .regex(/^[a-f0-9]{24}$/i, { message: 'Expected 24-char hex Mongo ID' })
       .optional(),
+    grade: z.string().trim().min(1).max(32).optional(),
+    activeDwellSeconds: z.coerce.number().int().min(1).max(3600).optional(),
     granularity: z.enum(['daily', 'weekly', 'monthly']).optional(),
   })
   .refine((v) => v.range !== 'custom' || (v.start && v.end), {
