@@ -2,6 +2,14 @@
 
 All notable changes to A-Guy-Dash are documented here. Follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## v0.6.0 — 2026-10-28
+
+Product Health catches up with Web PR #1504, which moved every visit-based KPI onto a per-visit dwell log. Adds a grade filter and an Active-threshold (dwell seconds) control, forwards both to Web's `/api/dashboard-metrics`, and shows a "data since" notice when the selected window starts before the dwell log's first full day. Drops the never-shipped Chat Usability metric. Every new schema field is optional, so against a Web prod without #1504 the dashboard still parses and the new controls simply have no effect.
+
+### Features
+
+- Product Health: grade filter, Active threshold, data-since notice (#39).
+
 ## v0.5.0 — 2026-10-25
 
 Guest-funnel release for the Users tab. Adds a Guest Insights section (landing-source breakdown, top landing paths and referrers, onboarding funnel, conversion by landing type, bot traffic) and makes the guest tile follow the period picker. Both depend on fields from Web PR #1465 (`guestInsights`, `guestSessionsInPeriod`, `guestConvertedInPeriod`); every new schema field is defaulted, so against a Web prod without #1465 the section renders an empty state and the guest tile shows the legacy period count without conversion cards, rather than failing the dashboard.
