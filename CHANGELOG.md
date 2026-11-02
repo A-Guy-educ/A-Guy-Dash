@@ -2,6 +2,14 @@
 
 All notable changes to A-Guy-Dash are documented here. Follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## v0.7.0 — 2026-11-02
+
+Adds an All / B2C / B2B segment picker to the Users tab, backed by Web PR #1540. Segment scopes `userMetrics` and monthly signups; the B2B view adds a school-adoption section (schools, classes, students, teachers, active students, per-school table) and hides guest-funnel content. The new `segment` field defaults to `all` and `b2bMetrics` is optional, so against a Web prod without #1540 the dashboard still parses and renders unsegmented data under the All layout.
+
+### Features
+
+- Users tab: B2C / B2B segment split (#42).
+
 ## v0.6.0 — 2026-10-28
 
 Product Health catches up with Web PR #1504, which moved every visit-based KPI onto a per-visit dwell log. Adds a grade filter and an Active-threshold (dwell seconds) control, forwards both to Web's `/api/dashboard-metrics`, and shows a "data since" notice when the selected window starts before the dwell log's first full day. Drops the never-shipped Chat Usability metric. Every new schema field is optional, so against a Web prod without #1504 the dashboard still parses and the new controls simply have no effect.
