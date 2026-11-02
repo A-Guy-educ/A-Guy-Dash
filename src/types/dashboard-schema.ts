@@ -116,8 +116,29 @@ export const guestInsightsSchema = z
   })
   .prefault({})
 
+// School adoption block (Web PR #1540) — only present for segment=b2b.
+export const b2bMetricsSchema = z.object({
+  schools: z.number(),
+  classes: z.number(),
+  students: z.number(),
+  teachers: z.number(),
+  activeStudentsInPeriod: z.number(),
+  perSchool: z.array(
+    z.object({
+      schoolId: z.string(),
+      schoolName: z.string(),
+      classes: z.number(),
+      students: z.number(),
+      activeStudentsInPeriod: z.number(),
+    }),
+  ),
+})
+
 export const dashboardMetricsSchema = z.object({
   period: z.enum(['day', 'week', 'month', 'year']),
+  // Echoed by Web PR #1540. Defaults to 'all' so a Web deploy that predates
+  // segmentation still parses — and reports, honestly, unsegmented data.
+  segment: z.enum(['all', 'b2c', 'b2b']).default('all'),
   userMetrics: z.object({
     activeUsersToday: z.number(),
     activeUsersYesterday: z.number(),
@@ -213,6 +234,7 @@ export const dashboardMetricsSchema = z.object({
   // instead of failing the entire dashboard load.
   productHealth: productHealthSchema.optional(),
   guestInsights: guestInsightsSchema,
+  b2bMetrics: b2bMetricsSchema.optional(),
   tokenMetrics: z.object({
     totalTokensToday: z.number(),
     totalTokensThisMonth: z.number(),

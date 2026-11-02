@@ -20,6 +20,48 @@ describe('dashboard metrics proxy', () => {
     expect(requestDashboardMetrics).not.toHaveBeenCalled()
   })
 
+  it('rejects an invalid segment before calling A-Guy-Web', async () => {
+    const { GET } = await import('./route')
+    const response = await GET(
+      new NextRequest('https://dash.aguy.co.il/api/dashboard-metrics?period=month&segment=b2x'),
+    )
+
+    expect(response.status).toBe(400)
+    expect(await response.json()).toEqual({ error: 'Invalid segment' })
+    expect(requestDashboardMetrics).not.toHaveBeenCalled()
+  })
+
+  it('forwards the segment and passes b2bMetrics through', async () => {
+    const b2bMetrics = {
+      schools: 2,
+      classes: 3,
+      students: 40,
+      teachers: 4,
+      activeStudentsInPeriod: 25,
+      perSchool: [
+        { schoolId: 's1', schoolName: 'A', classes: 2, students: 30, activeStudentsInPeriod: 20 },
+      ],
+    }
+    requestDashboardMetrics.mockResolvedValue(
+      Response.json({ ...dashboardFixture(), segment: 'b2b', b2bMetrics }),
+    )
+    const { GET } = await import('./route')
+
+    const response = await GET(
+      new NextRequest('https://dash.aguy.co.il/api/dashboard-metrics?period=month&segment=b2b'),
+    )
+
+    expect(response.status).toBe(200)
+    expect(requestDashboardMetrics).toHaveBeenCalledWith(
+      null,
+      'month',
+      expect.objectContaining({ segment: 'b2b' }),
+    )
+    const body = (await response.json()) as { segment: string; b2bMetrics: unknown }
+    expect(body.segment).toBe('b2b')
+    expect(body.b2bMetrics).toEqual(b2bMetrics)
+  })
+
   it('forwards day upstream verbatim', async () => {
     requestDashboardMetrics.mockResolvedValue(
       Response.json({ ...dashboardFixture(), period: 'day' }),

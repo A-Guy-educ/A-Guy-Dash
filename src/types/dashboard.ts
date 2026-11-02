@@ -11,6 +11,16 @@ export type Period = 'day' | 'week' | 'month' | 'year'
 export const VALID_PERIODS: readonly Period[] = ['day', 'week', 'month', 'year']
 
 /**
+ * User segment (Web PR #1540). A user is B2B when they sit in any class's
+ * `students[]` or `teachers[]` roster; everyone else is B2C. Segment scopes
+ * only `userMetrics` and `monthlySignups` — guest fields and every other
+ * block (engagement, tokens, revenue, …) stay platform-wide.
+ */
+export type Segment = 'all' | 'b2c' | 'b2b'
+
+export const VALID_SEGMENTS: readonly Segment[] = ['all', 'b2c', 'b2b']
+
+/**
  * Signup attribution counts for the selected period. Buckets sum to the same
  * total as registeredThisMonth / registeredThisWeek / etc. — both anchor on
  * user.createdAt. Only Google OAuth signups carry attribution today; users
@@ -326,8 +336,34 @@ export interface GuestInsights {
   bots: GuestBotMetrics
 }
 
+/**
+ * School adoption block (Web PR #1540), returned only for `segment=b2b`.
+ * Admins are excluded. A dual-role user (teaches one class, studies in
+ * another) counts in both `students` and `teachers` here, but once in the
+ * segmented `userMetrics`. "Active" = user-stats lastActiveDate on or after
+ * the period start, same rule as `returningUsers`. `perSchool` is sorted by
+ * students desc, top 20.
+ */
+export interface B2BSchoolRow {
+  schoolId: string
+  schoolName: string
+  classes: number
+  students: number
+  activeStudentsInPeriod: number
+}
+
+export interface B2BMetrics {
+  schools: number
+  classes: number
+  students: number
+  teachers: number
+  activeStudentsInPeriod: number
+  perSchool: B2BSchoolRow[]
+}
+
 export interface DashboardMetricsResponse {
   period: Period
+  segment: Segment
   userMetrics: UserMetrics
   monthlySignups: MonthlySignup[]
   contentCounts: ContentCounts
@@ -336,9 +372,11 @@ export interface DashboardMetricsResponse {
   tokenMetrics: TokenMetrics
   productHealth?: ProductHealth
   guestInsights: GuestInsights
+  b2bMetrics?: B2BMetrics
 }
 
 export {
+  b2bMetricsSchema,
   dashboardMetricsSchema,
   guestInsightsSchema,
   LANDING_TYPES,
