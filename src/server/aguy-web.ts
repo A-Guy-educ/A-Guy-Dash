@@ -7,6 +7,7 @@ import {
   dashboardMetricsSchema,
   type DashboardMetricsResponse,
   type Period,
+  type Segment,
 } from '@/types/dashboard'
 
 const DEFAULT_WEB_ORIGIN = 'https://www.aguy.co.il'
@@ -56,7 +57,7 @@ export function getLoginUrl(): string {
 export async function requestDashboardMetrics(
   cookieHeader: string | null,
   period: Period,
-  options: { fetcher?: typeof fetch; requestId?: string } = {},
+  options: { fetcher?: typeof fetch; requestId?: string; segment?: Segment } = {},
 ): Promise<Response> {
   const client = createAguyApiClient({
     baseUrl: getApiOrigin().origin,
@@ -64,7 +65,11 @@ export async function requestDashboardMetrics(
     fetch: options.fetcher,
   })
 
-  return client.requestRaw(`/api/dashboard-metrics?period=${period}`, {
+  // `all` is Web's default — omit it so the unsegmented request stays
+  // byte-identical to the pre-#1540 URL.
+  const segmentParam =
+    options.segment && options.segment !== 'all' ? `&segment=${options.segment}` : ''
+  return client.requestRaw(`/api/dashboard-metrics?period=${period}${segmentParam}`, {
     headers: options.requestId ? { 'x-request-id': options.requestId } : undefined,
   })
 }

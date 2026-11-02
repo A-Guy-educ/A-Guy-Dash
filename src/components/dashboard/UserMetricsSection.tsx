@@ -28,9 +28,16 @@ import { TrendBadge } from './TrendBadge'
 interface Props {
   metrics: UserMetrics
   period: Period
+  /**
+   * Guest fields are platform-wide even when the rest of `metrics` is
+   * segmented (Web #1540). The B2B view hides them — anonymous visitors
+   * aren't school users, and a platform number beside cohort numbers reads
+   * as if it were scoped.
+   */
+  showGuests?: boolean
 }
 
-export function UserMetricsSection({ metrics, period }: Props) {
+export function UserMetricsSection({ metrics, period, showGuests = true }: Props) {
   const t = useTranslations('dashboard.users')
   const locale = useLocale()
 
@@ -146,25 +153,27 @@ export function UserMetricsSection({ metrics, period }: Props) {
 
       {/* Guests + returning */}
       <div className="grid gap-content-gap grid-cols-1 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-heading-md">{t('guestSection')}</CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="grid gap-content-gap grid-cols-2 md:grid-cols-3">
-              <MetricCard label={t(`guestPeriod.${period}`)} value={periodGuests ?? '—'} />
-              {periodConverted !== undefined && (
-                <>
-                  <MetricCard label={t('converted')} value={periodConverted} />
-                  <MetricCard
-                    label={t('conversion')}
-                    value={formatPercent(percentOf(periodConverted, periodGuests ?? 0))}
-                  />
-                </>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+        {showGuests && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-heading-md">{t('guestSection')}</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="grid gap-content-gap grid-cols-2 md:grid-cols-3">
+                <MetricCard label={t(`guestPeriod.${period}`)} value={periodGuests ?? '—'} />
+                {periodConverted !== undefined && (
+                  <>
+                    <MetricCard label={t('converted')} value={periodConverted} />
+                    <MetricCard
+                      label={t('conversion')}
+                      value={formatPercent(percentOf(periodConverted, periodGuests ?? 0))}
+                    />
+                  </>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <Card>
           <CardHeader>

@@ -8,9 +8,10 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 const periodSchema = z.enum(['day', 'week', 'month', 'year'])
+const segmentSchema = z.enum(['all', 'b2c', 'b2b'])
 
 function errorForStatus(status: number): string {
-  if (status === 400) return 'Invalid period'
+  if (status === 400) return 'Invalid request'
   if (status === 401) return 'Unauthorized'
   if (status === 403) return 'Forbidden'
   return 'Failed to load dashboard metrics'
@@ -24,9 +25,16 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: 'Invalid period' }, { status: 400 })
   }
 
+  const segment = segmentSchema.safeParse(request.nextUrl.searchParams.get('segment') ?? 'all')
+
+  if (!segment.success) {
+    return NextResponse.json({ error: 'Invalid segment' }, { status: 400 })
+  }
+
   try {
     const upstream = await requestDashboardMetrics(request.headers.get('cookie'), period.data, {
       requestId,
+      segment: segment.data,
     })
 
     if (!upstream.ok) {

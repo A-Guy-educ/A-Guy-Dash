@@ -28,6 +28,13 @@
       "month": "חודש",
       "year": "שנה"
     },
+    "segment": {
+      "label": "פלח משתמשים",
+      "all": "הכל",
+      "b2c": "B2C",
+      "b2b": "B2B (בתי ספר)"
+    },
+    "segmentScopeNote": "B2C / B2B מפצל את ספירות המשתמשים וההרשמות. תנועת האורחים היא של כל הפלטפורמה.",
     "tabs": {
       "productHealth": "בריאות המוצר",
       "users": "משתמשים",
@@ -147,6 +154,20 @@
       "returningHintSuffix": "משתמשים שנרשמו לפני התקופה",
       "returnedOnce": "חזרו לפחות פעם",
       "returnedMultiple": "חזרו יותר מפעמיים"
+    },
+    "b2b": {
+      "section": "בתי ספר",
+      "awaitingUpstream": "נתוני בתי הספר עדיין לא זמינים.",
+      "schools": "בתי ספר",
+      "classes": "כיתות",
+      "students": "תלמידים",
+      "teachers": "מורים",
+      "activeStudents": "תלמידים פעילים בתקופה",
+      "perSchool": "בתי הספר המובילים לפי תלמידים",
+      "noSchools": "אין עדיין בתי ספר עם כיתות",
+      "classesSuffix": "כיתות",
+      "activeSuffix": "פעילים",
+      "studentsSuffix": "תלמידים"
     },
     "signupSources": {
       "section": "מקורות הרשמה",

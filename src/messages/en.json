@@ -28,6 +28,13 @@
       "month": "Month",
       "year": "Year"
     },
+    "segment": {
+      "label": "User segment",
+      "all": "All",
+      "b2c": "B2C",
+      "b2b": "B2B (schools)"
+    },
+    "segmentScopeNote": "B2C / B2B splits user counts and signups. Guest traffic is platform-wide.",
     "tabs": {
       "productHealth": "Product Health",
       "users": "Users",
@@ -147,6 +154,20 @@
       "returningHintSuffix": "pre-period users",
       "returnedOnce": "Returned once",
       "returnedMultiple": "Returned >2x"
+    },
+    "b2b": {
+      "section": "Schools",
+      "awaitingUpstream": "School metrics not yet available upstream.",
+      "schools": "Schools",
+      "classes": "Classes",
+      "students": "Students",
+      "teachers": "Teachers",
+      "activeStudents": "Active students in period",
+      "perSchool": "Top schools by students",
+      "noSchools": "No schools with classes yet",
+      "classesSuffix": "classes",
+      "activeSuffix": "active",
+      "studentsSuffix": "students"
     },
     "signupSources": {
       "section": "Signup sources",
