@@ -17,6 +17,13 @@
  * period buckets with the monthly signups chart since both are user-time
  * views of the same underlying data.
  *
+ * The Users tab carries an All / B2C / B2B segment picker (Web #1540).
+ * Segment scopes only userMetrics + monthlySignups upstream, so the picker
+ * lives inside that tab rather than in the header. Content is keyed off
+ * `data.segment` (what Web actually returned), not the requested segment,
+ * so an older Web that ignores the param never renders platform numbers
+ * under a B2B layout.
+ *
  * @fileType component
  * @domain dashboard
  * @pattern container
@@ -30,8 +37,9 @@ import { useCallback, useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useTranslations } from '@/components/i18n'
-import type { DashboardMetricsResponse, Period } from '@/types/dashboard'
+import type { DashboardMetricsResponse, Period, Segment } from '@/types/dashboard'
 
+import { B2BMetricsSection } from './B2BMetricsSection'
 import { ContentCountsSection } from './ContentCountsSection'
 import { EngagementSection } from './EngagementSection'
 import { GuestInsightsSection } from './GuestInsightsSection'
@@ -39,6 +47,7 @@ import { MonthlySignupsSection } from './MonthlySignupsSection'
 import { PeriodSelector } from './PeriodSelector'
 import { ProductHealthSection } from './product-health/ProductHealthSection'
 import { RevenueSection } from './RevenueSection'
+import { SegmentSelector } from './SegmentSelector'
 import { TokensSection } from './TokensSection'
 import { UserMetricsSection } from './UserMetricsSection'
 
@@ -57,6 +66,7 @@ const TABS_WITHOUT_PERIOD = new Set(['productHealth'])
 export function DashboardShell({ initialData }: Props) {
   const t = useTranslations('dashboard')
   const [period, setPeriod] = useState<Period>(initialData.period)
+  const [segment, setSegment] = useState<Segment>(initialData.segment)
   const [data, setData] = useState<DashboardMetricsResponse>(initialData)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [hasError, setHasError] = useState(false)
@@ -64,14 +74,17 @@ export function DashboardShell({ initialData }: Props) {
 
   const showPeriodPicker = !TABS_WITHOUT_PERIOD.has(activeTab)
 
-  const fetchForPeriod = useCallback(async (next: Period) => {
+  const fetchMetrics = useCallback(async (nextPeriod: Period, nextSegment: Segment) => {
     setIsRefreshing(true)
     setHasError(false)
     try {
-      const res = await fetch(`/api/dashboard-metrics?period=${next}`, {
-        credentials: 'include',
-        cache: 'no-store',
-      })
+      const res = await fetch(
+        `/api/dashboard-metrics?period=${nextPeriod}&segment=${nextSegment}`,
+        {
+          credentials: 'include',
+          cache: 'no-store',
+        },
+      )
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const json = (await res.json()) as DashboardMetricsResponse
       setData(json)
@@ -86,9 +99,9 @@ export function DashboardShell({ initialData }: Props) {
     // Guard against the currently-loaded payload's period, not the server's
     // initial period — otherwise Week → Month early-returns because Month
     // matches the initial default while `data` still holds Week.
-    if (period === data.period) return
-    void fetchForPeriod(period)
-  }, [period, data.period, fetchForPeriod])
+    if (period === data.period && segment === data.segment) return
+    void fetchMetrics(period, segment)
+  }, [period, segment, data.period, data.segment, fetchMetrics])
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-section-md space-y-8">
@@ -117,7 +130,7 @@ export function DashboardShell({ initialData }: Props) {
             type="button"
             size="sm"
             variant="outline"
-            onClick={() => void fetchForPeriod(period)}
+            onClick={() => void fetchMetrics(period, segment)}
             disabled={isRefreshing}
           >
             {t('retry')}
@@ -140,8 +153,17 @@ export function DashboardShell({ initialData }: Props) {
         </TabsContent>
 
         <TabsContent value="users" className="space-y-8">
-          <UserMetricsSection metrics={data.userMetrics} period={data.period} />
-          <GuestInsightsSection insights={data.guestInsights} />
+          <div className="flex items-center justify-between flex-wrap gap-content-gap">
+            <p className="text-body-sm text-muted-foreground">{t('segmentScopeNote')}</p>
+            <SegmentSelector value={segment} onChange={setSegment} disabled={isRefreshing} />
+          </div>
+          {data.segment === 'b2b' && <B2BMetricsSection metrics={data.b2bMetrics} />}
+          <UserMetricsSection
+            metrics={data.userMetrics}
+            period={data.period}
+            showGuests={data.segment !== 'b2b'}
+          />
+          {data.segment !== 'b2b' && <GuestInsightsSection insights={data.guestInsights} />}
           <MonthlySignupsSection months={data.monthlySignups} />
         </TabsContent>
 

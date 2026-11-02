@@ -51,6 +51,21 @@ describe('A-Guy-Web boundary', () => {
     expect(new Headers(fetcher.mock.calls[0]?.[1]?.headers).has('cookie')).toBe(false)
   })
 
+  it('appends a non-default segment and omits all', async () => {
+    vi.stubEnv('AGUY_API_URL', 'https://api.aguy.co.il')
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response('{}'))
+
+    await requestDashboardMetrics(null, 'month', { fetcher, segment: 'b2b' })
+    await requestDashboardMetrics(null, 'month', { fetcher, segment: 'all' })
+
+    expect(String(fetcher.mock.calls[0]?.[0])).toBe(
+      'https://api.aguy.co.il/api/dashboard-metrics?period=month&segment=b2b',
+    )
+    expect(String(fetcher.mock.calls[1]?.[0])).toBe(
+      'https://api.aguy.co.il/api/dashboard-metrics?period=month',
+    )
+  })
+
   it('forwards the cookie to shared logout', async () => {
     vi.stubEnv('AGUY_API_URL', 'https://api.aguy.co.il')
     const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response('{}'))

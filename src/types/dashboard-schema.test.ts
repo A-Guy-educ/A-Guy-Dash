@@ -33,6 +33,20 @@ const EMPTY_GUEST_INSIGHTS = {
   },
 }
 
+describe('segment', () => {
+  it("defaults to 'all' when an older Web omits it", () => {
+    const older: Partial<ReturnType<typeof dashboardFixture>> = dashboardFixture()
+    delete older.segment
+    expect(dashboardMetricsSchema.parse(older).segment).toBe('all')
+  })
+
+  it('rejects an unknown segment', () => {
+    expect(
+      dashboardMetricsSchema.safeParse({ ...dashboardFixture(), segment: 'b2g' }).success,
+    ).toBe(false)
+  })
+})
+
 describe('guestInsights schema', () => {
   it('passes a full payload through unchanged', () => {
     const fixture = dashboardFixture()

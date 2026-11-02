@@ -3,6 +3,7 @@ import type { DashboardMetricsResponse } from '@/types/dashboard'
 export function dashboardFixture(): DashboardMetricsResponse {
   return {
     period: 'month',
+    segment: 'all',
     userMetrics: {
       activeUsersToday: 1,
       activeUsersYesterday: 1,
