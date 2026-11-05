@@ -116,6 +116,31 @@ export const guestInsightsSchema = z
   })
   .prefault({})
 
+// Revenue tab payment outcomes. `succeeded` counts every charge that went
+// through, refunded ones included; pending checkouts are excluded.
+const paymentOutcomeCountsSchema = z.object({ succeeded: count, failed: count }).prefault({})
+
+const paymentOutcomesSchema = z.object({
+  firstPurchase: paymentOutcomeCountsSchema,
+  renewal: paymentOutcomeCountsSchema,
+})
+
+const failureReasonSchema = z.object({
+  provider: z.string(),
+  code: z.string(),
+  count: z.number(),
+  agorot: z.number(),
+})
+
+// B2C is real money from transactions; B2B is an estimate (roster students
+// × a flat per-seat monthly price) until school subscriptions exist.
+const revenueSegmentsSchema = z.object({
+  b2c: z.object({ payers: count, revenueAgorot: count }).prefault({}),
+  b2b: z
+    .object({ students: count, seatPriceAgorot: count, estimatedRevenueAgorot: count })
+    .prefault({}),
+})
+
 // School adoption block (Web PR #1540) — only present for segment=b2b.
 export const b2bMetricsSchema = z.object({
   schools: z.number(),
@@ -228,6 +253,11 @@ export const dashboardMetricsSchema = z.object({
     transactionCount: z.number(),
     successRate: z.number(),
     topProducts: z.array(z.object({ productName: z.string(), agorot: z.number() })),
+    // Optional — Web may ship these after Dash. Missing fields fall back to
+    // the older transactions / success-rate cards.
+    payments: paymentOutcomesSchema.optional(),
+    failureReasons: z.array(failureReasonSchema).optional(),
+    segments: revenueSegmentsSchema.optional(),
   }),
   // Optional — Web may ship the aggregation after Dash. Missing field
   // degrades the Product Health tab to an "awaiting upstream" empty state
