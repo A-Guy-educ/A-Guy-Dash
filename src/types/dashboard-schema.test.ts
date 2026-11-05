@@ -144,3 +144,41 @@ describe('guest insights math', () => {
     })
   })
 })
+
+describe('revenueMetrics payment / segment fields', () => {
+  it('passes the full payload through unchanged', () => {
+    const fixture = dashboardFixture()
+    expect(dashboardMetricsSchema.parse(fixture).revenueMetrics).toEqual(fixture.revenueMetrics)
+  })
+
+  it('leaves them undefined when an older Web omits them', () => {
+    const older = dashboardFixture()
+    delete older.revenueMetrics.payments
+    delete older.revenueMetrics.failureReasons
+    delete older.revenueMetrics.segments
+    const parsed = dashboardMetricsSchema.parse(older).revenueMetrics
+    expect(parsed.payments).toBeUndefined()
+    expect(parsed.failureReasons).toBeUndefined()
+    expect(parsed.segments).toBeUndefined()
+  })
+
+  it('fills missing counts inside partial nested objects', () => {
+    const fixture = dashboardFixture()
+    const parsed = dashboardMetricsSchema.parse({
+      ...fixture,
+      revenueMetrics: {
+        ...fixture.revenueMetrics,
+        payments: { firstPurchase: { succeeded: 3 } },
+        segments: { b2b: { students: 10 } },
+      },
+    }).revenueMetrics
+    expect(parsed.payments).toEqual({
+      firstPurchase: { succeeded: 3, failed: 0 },
+      renewal: { succeeded: 0, failed: 0 },
+    })
+    expect(parsed.segments).toEqual({
+      b2c: { payers: 0, revenueAgorot: 0 },
+      b2b: { students: 10, seatPriceAgorot: 0, estimatedRevenueAgorot: 0 },
+    })
+  })
+})

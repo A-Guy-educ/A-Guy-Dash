@@ -296,7 +296,24 @@
       "failedIls": "Failed (ILS)",
       "topProducts": "Top products in period",
       "noTransactions": "No paid transactions in this period.",
-      "deletedProductPrefix": "Deleted product"
+      "deletedProductPrefix": "Deleted product",
+      "payers": "Payers",
+      "b2cPayers": "B2C payers",
+      "b2cPayersHint": "Distinct users with a successful payment in period",
+      "b2cRevenue": "B2C revenue (ILS)",
+      "b2bPayers": "School students (B2B)",
+      "b2bPayersHint": "Students on a school class roster",
+      "schoolRevenue": "School revenue (est., monthly)",
+      "schoolRevenueHint": "Estimate: {price} × {students} students per month",
+      "payments": "Payments",
+      "succeededPayments": "Successful payments",
+      "failedPayments": "Failed payments",
+      "splitHint": "{first} first purchase · {renewals} renewal",
+      "successRateHint": "Successful ÷ (successful + failed). Pending excluded.",
+      "failureReasons": "Failure reasons",
+      "noFailures": "No failed payments in this period.",
+      "responseCode": "code",
+      "unknownReason": "no reason recorded"
     }
   }
 }

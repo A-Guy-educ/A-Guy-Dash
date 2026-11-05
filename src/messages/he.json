@@ -296,7 +296,24 @@
       "failedIls": "נכשלו (ILS)",
       "topProducts": "מוצרים מובילים בתקופה",
       "noTransactions": "אין עסקאות בתקופה זו.",
-      "deletedProductPrefix": "מוצר שנמחק"
+      "deletedProductPrefix": "מוצר שנמחק",
+      "payers": "משלמים",
+      "b2cPayers": "משלמים B2C",
+      "b2cPayersHint": "משתמשים ייחודיים עם תשלום מוצלח בתקופה",
+      "b2cRevenue": "הכנסות B2C (ILS)",
+      "b2bPayers": "תלמידים בבתי ספר (B2B)",
+      "b2bPayersHint": "תלמידים הרשומים בכיתה של בית ספר",
+      "schoolRevenue": "הכנסות בתי ספר (הערכה, חודשי)",
+      "schoolRevenueHint": "הערכה: {price} × {students} תלמידים לחודש",
+      "payments": "תשלומים",
+      "succeededPayments": "תשלומים מוצלחים",
+      "failedPayments": "תשלומים שנכשלו",
+      "splitHint": "{first} רכישה ראשונה · {renewals} חידוש",
+      "successRateHint": "מוצלחים ÷ (מוצלחים + נכשלים). ללא ממתינים.",
+      "failureReasons": "סיבות כישלון",
+      "noFailures": "אין תשלומים שנכשלו בתקופה זו.",
+      "responseCode": "קוד",
+      "unknownReason": "לא נרשמה סיבה"
     }
   }
 }
