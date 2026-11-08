@@ -313,7 +313,13 @@
       "failureReasons": "Failure reasons",
       "noFailures": "No failed payments in this period.",
       "responseCode": "code",
-      "unknownReason": "no reason recorded"
+      "unknownReason": "no reason recorded",
+      "reason": {
+        "activationAbandoned": "subscription cancelled before activation",
+        "asyncPaymentFailed": "delayed payment failed",
+        "sessionExpired": "checkout expired",
+        "checkoutAbandoned": "checkout abandoned"
+      }
     }
   }
 }
