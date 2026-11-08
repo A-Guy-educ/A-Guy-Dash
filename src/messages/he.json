@@ -313,7 +313,13 @@
       "failureReasons": "סיבות כישלון",
       "noFailures": "אין תשלומים שנכשלו בתקופה זו.",
       "responseCode": "קוד",
-      "unknownReason": "לא נרשמה סיבה"
+      "unknownReason": "לא נרשמה סיבה",
+      "reason": {
+        "activationAbandoned": "המנוי בוטל לפני ההפעלה",
+        "asyncPaymentFailed": "תשלום מושהה נכשל",
+        "sessionExpired": "פג תוקף הקופה",
+        "checkoutAbandoned": "רכישה שננטשה"
+      }
     }
   }
 }

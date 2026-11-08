@@ -49,6 +49,23 @@ function makeCurrencyFormatter(locale: string): Formatter {
   }
 }
 
+// Non-numeric failure codes Admin writes (A-Guy-Admin
+// src/lib/payment/failure-codes.ts — stable contract). Numeric Tranzila
+// response codes render raw.
+const FAILURE_SLUG_KEYS: Record<string, string> = {
+  unknown: 'unknownReason',
+  activation_abandoned: 'reason.activationAbandoned',
+  async_payment_failed: 'reason.asyncPaymentFailed',
+  session_expired: 'reason.sessionExpired',
+  checkout_abandoned: 'reason.checkoutAbandoned',
+}
+
+function failureLabel(reason: FailureReason, t: Translate): string {
+  const slugKey = FAILURE_SLUG_KEYS[reason.code]
+  const detail = slugKey ? t(slugKey) : `${t('responseCode')} ${reason.code}`
+  return `${reason.provider} · ${detail}`
+}
+
 function interpolate(template: string, values: Record<string, string>): string {
   return template.replace(/\{(\w+)\}/g, (_, key) => values[key] ?? `{${key}}`)
 }
@@ -238,11 +255,7 @@ function FailureReasonsCard({
                 key={`${reason.provider}:${reason.code}`}
                 className="flex items-center justify-between gap-content-gap py-3"
               >
-                <span className="text-foreground">
-                  {reason.code === 'unknown'
-                    ? `${reason.provider} · ${t('unknownReason')}`
-                    : `${reason.provider} · ${t('responseCode')} ${reason.code}`}
-                </span>
+                <span className="text-foreground">{failureLabel(reason, t)}</span>
                 <span className="tabular-nums text-muted-foreground">
                   <span className="font-semibold text-foreground">
                     {reason.count.toLocaleString(locale)}
