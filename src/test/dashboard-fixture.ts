@@ -62,6 +62,15 @@ export function dashboardFixture(): DashboardMetricsResponse {
       transactionCount: 1,
       successRate: 100,
       topProducts: [],
+      payments: {
+        firstPurchase: { succeeded: 1, failed: 0 },
+        renewal: { succeeded: 0, failed: 0 },
+      },
+      failureReasons: [],
+      segments: {
+        b2c: { payers: 1, revenueAgorot: 1 },
+        b2b: { students: 0, seatPriceAgorot: 5900, estimatedRevenueAgorot: 0 },
+      },
     },
     tokenMetrics: {
       totalTokensToday: 1,

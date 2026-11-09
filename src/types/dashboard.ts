@@ -151,13 +151,43 @@ export interface TopProduct {
   agorot: number
 }
 
+export interface PaymentOutcomeCounts {
+  /** Charges that went through, refunded ones included. */
+  succeeded: number
+  failed: number
+}
+
+export interface PaymentOutcomes {
+  firstPurchase: PaymentOutcomeCounts
+  renewal: PaymentOutcomeCounts
+}
+
+export interface FailureReason {
+  provider: string
+  /** Provider response code, or 'unknown' when none was recorded. */
+  code: string
+  count: number
+  agorot: number
+}
+
+export interface RevenueSegments {
+  b2c: { payers: number; revenueAgorot: number }
+  /** Estimate: roster students × flat monthly seat price. */
+  b2b: { students: number; seatPriceAgorot: number; estimatedRevenueAgorot: number }
+}
+
 export interface RevenueMetrics {
   totalRevenueAgorot: CurrencyRevenue
   refundedAgorot: number
   failedAgorot: number
+  /** Settled transactions in period — pending checkouts excluded. */
   transactionCount: number
   successRate: number
   topProducts: TopProduct[]
+  // Optional until Web ships them; RevenueSection falls back without them.
+  payments?: PaymentOutcomes
+  failureReasons?: FailureReason[]
+  segments?: RevenueSegments
 }
 
 export interface TopLessonByTokens {
