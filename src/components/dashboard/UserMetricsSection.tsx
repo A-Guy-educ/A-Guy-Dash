@@ -29,10 +29,8 @@ interface Props {
   metrics: UserMetrics
   period: Period
   /**
-   * Guest fields are platform-wide even when the rest of `metrics` is
-   * segmented (Web #1540). The B2B view hides them — anonymous visitors
-   * aren't school users, and a platform number beside cohort numbers reads
-   * as if it were scoped.
+   * Anonymous visitors can't be classified into a segment, so guest cards
+   * only make sense under All / B2C. The shell hides them for B2B / Other.
    */
   showGuests?: boolean
 }

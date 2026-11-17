@@ -161,9 +161,10 @@ export const b2bMetricsSchema = z.object({
 
 export const dashboardMetricsSchema = z.object({
   period: z.enum(['day', 'week', 'month', 'year']),
-  // Echoed by Web PR #1540. Defaults to 'all' so a Web deploy that predates
-  // segmentation still parses — and reports, honestly, unsegmented data.
-  segment: z.enum(['all', 'b2c', 'b2b']).default('all'),
+  // Echoed by Web PRs #1540 / #1621. Defaults to 'all' so a Web deploy that
+  // predates segmentation still parses — and reports, honestly, unsegmented
+  // data.
+  segment: z.enum(['all', 'b2c', 'b2b', 'other']).default('all'),
   userMetrics: z.object({
     activeUsersToday: z.number(),
     activeUsersYesterday: z.number(),

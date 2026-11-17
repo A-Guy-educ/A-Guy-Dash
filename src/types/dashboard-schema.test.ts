@@ -40,6 +40,12 @@ describe('segment', () => {
     expect(dashboardMetricsSchema.parse(older).segment).toBe('all')
   })
 
+  it("parses segment 'other'", () => {
+    expect(dashboardMetricsSchema.parse({ ...dashboardFixture(), segment: 'other' }).segment).toBe(
+      'other',
+    )
+  })
+
   it('rejects an unknown segment', () => {
     expect(
       dashboardMetricsSchema.safeParse({ ...dashboardFixture(), segment: 'b2g' }).success,

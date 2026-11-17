@@ -32,9 +32,12 @@
       "label": "User segment",
       "all": "All",
       "b2c": "B2C",
-      "b2b": "B2B (schools)"
+      "b2b": "B2B (schools)",
+      "other": "Other (schools)"
     },
-    "segmentScopeNote": "B2C / B2B splits user counts and signups. Guest traffic is platform-wide.",
+    "segmentGuestNote": "Anonymous visitors appear under All and B2C only.",
+    "segmentNotSplit": "Not split by segment yet. Showing all users.",
+    "segmentSameForAll": "Same for every segment.",
     "tabs": {
       "productHealth": "Product Health",
       "users": "Users",

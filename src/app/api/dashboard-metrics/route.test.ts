@@ -31,6 +31,25 @@ describe('dashboard metrics proxy', () => {
     expect(requestDashboardMetrics).not.toHaveBeenCalled()
   })
 
+  it("accepts and forwards segment 'other'", async () => {
+    requestDashboardMetrics.mockResolvedValue(
+      Response.json({ ...dashboardFixture(), segment: 'other' }),
+    )
+    const { GET } = await import('./route')
+
+    const response = await GET(
+      new NextRequest('https://dash.aguy.co.il/api/dashboard-metrics?period=month&segment=other'),
+    )
+
+    expect(response.status).toBe(200)
+    expect(requestDashboardMetrics).toHaveBeenCalledWith(
+      null,
+      'month',
+      expect.objectContaining({ segment: 'other' }),
+    )
+    expect(((await response.json()) as { segment: string }).segment).toBe('other')
+  })
+
   it('forwards the segment and passes b2bMetrics through', async () => {
     const b2bMetrics = {
       schools: 2,

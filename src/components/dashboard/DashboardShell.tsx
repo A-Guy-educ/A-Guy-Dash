@@ -17,12 +17,13 @@
  * period buckets with the monthly signups chart since both are user-time
  * views of the same underlying data.
  *
- * The Users tab carries an All / B2C / B2B segment picker (Web #1540).
- * Segment scopes only userMetrics + monthlySignups upstream, so the picker
- * lives inside that tab rather than in the header. Content is keyed off
- * `data.segment` (what Web actually returned), not the requested segment,
- * so an older Web that ignores the param never renders platform numbers
- * under a B2B layout.
+ * One segment switch (All / B2C / B2B / Other, Web #1540 + #1621) sits
+ * above the tabs and drives every tab. It's mirrored into `?segment=` so a
+ * view can be shared. Layout is keyed off `data.segment` (what Web actually
+ * returned), not the requested segment, so an older Web that ignores the
+ * param never renders platform numbers under a segmented layout. Tabs Web
+ * doesn't scope yet (Revenue, Product Health) carry a muted note while a
+ * segment is active; Content always says it's segment-independent.
  *
  * @fileType component
  * @domain dashboard
@@ -32,6 +33,7 @@
 
 'use client'
 
+import type React from 'react'
 import { useCallback, useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -63,6 +65,14 @@ interface Props {
 // tab-owned filters carry the whole story.
 const TABS_WITHOUT_PERIOD = new Set(['productHealth'])
 
+// Anonymous visitors can't be classified, so guest views only make sense
+// when the cohort includes unclassified consumers.
+const SEGMENTS_WITH_GUESTS = new Set<Segment>(['all', 'b2c'])
+
+function ScopeNote({ children }: { children: React.ReactNode }) {
+  return <p className="text-body-sm text-muted-foreground">{children}</p>
+}
+
 export function DashboardShell({ initialData }: Props) {
   const t = useTranslations('dashboard')
   const [period, setPeriod] = useState<Period>(initialData.period)
@@ -73,6 +83,8 @@ export function DashboardShell({ initialData }: Props) {
   const [activeTab, setActiveTab] = useState('productHealth')
 
   const showPeriodPicker = !TABS_WITHOUT_PERIOD.has(activeTab)
+  const showGuests = SEGMENTS_WITH_GUESTS.has(data.segment)
+  const isSegmented = data.segment !== 'all'
 
   const fetchMetrics = useCallback(async (nextPeriod: Period, nextSegment: Segment) => {
     setIsRefreshing(true)
@@ -103,6 +115,16 @@ export function DashboardShell({ initialData }: Props) {
     void fetchMetrics(period, segment)
   }, [period, segment, data.period, data.segment, fetchMetrics])
 
+  useEffect(() => {
+    // Mirror the switch into the URL (replace, not push — flipping
+    // segments shouldn't pile up history entries). `all` is the default,
+    // so it's dropped to keep the plain URL clean.
+    const url = new URL(window.location.href)
+    if (segment === 'all') url.searchParams.delete('segment')
+    else url.searchParams.set('segment', segment)
+    if (url.href !== window.location.href) window.history.replaceState(null, '', url)
+  }, [segment])
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-section-md space-y-8">
       <header className="flex items-center justify-between flex-wrap gap-content-gap">
@@ -119,6 +141,11 @@ export function DashboardShell({ initialData }: Props) {
           <PeriodSelector value={period} onChange={setPeriod} disabled={isRefreshing} />
         )}
       </header>
+
+      <div className="space-y-2">
+        <SegmentSelector value={segment} onChange={setSegment} disabled={isRefreshing} />
+        <ScopeNote>{t('segmentGuestNote')}</ScopeNote>
+      </div>
 
       {hasError && (
         <div
@@ -148,26 +175,24 @@ export function DashboardShell({ initialData }: Props) {
           <TabsTrigger value="revenue">{t('tabs.revenue')}</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="productHealth">
+        <TabsContent value="productHealth" className="space-y-4">
+          {isSegmented && <ScopeNote>{t('segmentNotSplit')}</ScopeNote>}
           <ProductHealthSection productHealth={data.productHealth} />
         </TabsContent>
 
         <TabsContent value="users" className="space-y-8">
-          <div className="flex items-center justify-between flex-wrap gap-content-gap">
-            <p className="text-body-sm text-muted-foreground">{t('segmentScopeNote')}</p>
-            <SegmentSelector value={segment} onChange={setSegment} disabled={isRefreshing} />
-          </div>
           {data.segment === 'b2b' && <B2BMetricsSection metrics={data.b2bMetrics} />}
           <UserMetricsSection
             metrics={data.userMetrics}
             period={data.period}
-            showGuests={data.segment !== 'b2b'}
+            showGuests={showGuests}
           />
-          {data.segment !== 'b2b' && <GuestInsightsSection insights={data.guestInsights} />}
+          {showGuests && <GuestInsightsSection insights={data.guestInsights} />}
           <MonthlySignupsSection months={data.monthlySignups} />
         </TabsContent>
 
-        <TabsContent value="content">
+        <TabsContent value="content" className="space-y-4">
+          <ScopeNote>{t('segmentSameForAll')}</ScopeNote>
           <ContentCountsSection counts={data.contentCounts} />
         </TabsContent>
 
@@ -179,7 +204,8 @@ export function DashboardShell({ initialData }: Props) {
           <TokensSection tokens={data.tokenMetrics} />
         </TabsContent>
 
-        <TabsContent value="revenue">
+        <TabsContent value="revenue" className="space-y-4">
+          {isSegmented && <ScopeNote>{t('segmentNotSplit')}</ScopeNote>}
           <RevenueSection revenue={data.revenueMetrics} />
         </TabsContent>
       </Tabs>
