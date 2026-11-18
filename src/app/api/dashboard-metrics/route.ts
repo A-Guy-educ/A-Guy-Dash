@@ -8,7 +8,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 const periodSchema = z.enum(['day', 'week', 'month', 'year'])
-const segmentSchema = z.enum(['all', 'b2c', 'b2b'])
+const segmentSchema = z.enum(['all', 'b2c', 'b2b', 'other'])
 
 function errorForStatus(status: number): string {
   if (status === 400) return 'Invalid request'
