@@ -57,12 +57,16 @@ describe('A-Guy-Web boundary', () => {
 
     await requestDashboardMetrics(null, 'month', { fetcher, segment: 'b2b' })
     await requestDashboardMetrics(null, 'month', { fetcher, segment: 'all' })
+    await requestDashboardMetrics(null, 'month', { fetcher, segment: 'other' })
 
     expect(String(fetcher.mock.calls[0]?.[0])).toBe(
       'https://api.aguy.co.il/api/dashboard-metrics?period=month&segment=b2b',
     )
     expect(String(fetcher.mock.calls[1]?.[0])).toBe(
       'https://api.aguy.co.il/api/dashboard-metrics?period=month',
+    )
+    expect(String(fetcher.mock.calls[2]?.[0])).toBe(
+      'https://api.aguy.co.il/api/dashboard-metrics?period=month&segment=other',
     )
   })
 

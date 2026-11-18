@@ -11,14 +11,20 @@ export type Period = 'day' | 'week' | 'month' | 'year'
 export const VALID_PERIODS: readonly Period[] = ['day', 'week', 'month', 'year']
 
 /**
- * User segment (Web PR #1540). A user is B2B when they sit in any class's
- * `students[]` or `teachers[]` roster; everyone else is B2C. Segment scopes
- * only `userMetrics` and `monthlySignups` — guest fields and every other
- * block (engagement, tokens, revenue, …) stay platform-wide.
+ * User segment (Web PRs #1540, #1621). Rules live in Web:
+ * - b2b: on a class roster (students/teachers) or onboardingType 'b2b'
+ * - other: school/institutional email domain, or arrived via Google
+ *   Classroom or /join, and not b2b
+ * - b2c: everyone else
+ * b2c + b2b + other = all.
+ *
+ * Web scopes userMetrics, monthlySignups, signup sources, engagement,
+ * tokens and guestInsights by segment. revenueMetrics and productHealth are
+ * not scoped yet (Web follow-up); contentCounts never will be.
  */
-export type Segment = 'all' | 'b2c' | 'b2b'
+export type Segment = 'all' | 'b2c' | 'b2b' | 'other'
 
-export const VALID_SEGMENTS: readonly Segment[] = ['all', 'b2c', 'b2b']
+export const VALID_SEGMENTS: readonly Segment[] = ['all', 'b2c', 'b2b', 'other']
 
 /**
  * Signup attribution counts for the selected period. Buckets sum to the same
