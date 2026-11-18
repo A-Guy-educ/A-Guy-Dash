@@ -2,6 +2,14 @@
 
 All notable changes to A-Guy-Dash are documented here. Follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## v0.9.0 — 2026-11-18
+
+Page-wide segment switch, backed by Web #1621. The segment picker now scopes the whole dashboard and adds a fourth bucket, `other` (school/institutional email domains and Google Classroom or `/join` arrivals that aren't on a class roster), so b2c + b2b + other = all. `segment` still defaults to `all`, so the dashboard parses against a Web build that predates #1621.
+
+### Features
+
+- Page-wide segment switch with `other` segment (#51).
+
 ## v0.8.0 — 2026-11-09
 
 Revenue tab rework, backed by Web commit `4496450ff`. Adds a B2C / B2B payers split (B2B is an estimate from roster students × a flat seat price), payment outcomes for first purchases and renewals, and a failure-reasons breakdown with readable labels for Admin failure-code slugs. The new `payments`, `failureReasons` and `segments` fields are all optional, so against a Web prod without that commit the dashboard still parses and the tab falls back to the older transactions and success-rate cards.
