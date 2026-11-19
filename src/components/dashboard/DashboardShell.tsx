@@ -44,6 +44,7 @@ import type { DashboardMetricsResponse, Period, Segment } from '@/types/dashboar
 import { B2BMetricsSection } from './B2BMetricsSection'
 import { ContentCountsSection } from './ContentCountsSection'
 import { EngagementSection } from './EngagementSection'
+import { FunnelSection } from './FunnelSection'
 import { GuestInsightsSection } from './GuestInsightsSection'
 import { MonthlySignupsSection } from './MonthlySignupsSection'
 import { PeriodSelector } from './PeriodSelector'
@@ -169,6 +170,7 @@ export function DashboardShell({ initialData }: Props) {
         <TabsList>
           <TabsTrigger value="productHealth">{t('tabs.productHealth')}</TabsTrigger>
           <TabsTrigger value="users">{t('tabs.users')}</TabsTrigger>
+          <TabsTrigger value="funnel">{t('tabs.funnel')}</TabsTrigger>
           <TabsTrigger value="content">{t('tabs.content')}</TabsTrigger>
           <TabsTrigger value="engagement">{t('tabs.engagement')}</TabsTrigger>
           <TabsTrigger value="tokens">{t('tabs.tokens')}</TabsTrigger>
@@ -189,6 +191,10 @@ export function DashboardShell({ initialData }: Props) {
           />
           {showGuests && <GuestInsightsSection insights={data.guestInsights} />}
           <MonthlySignupsSection months={data.monthlySignups} />
+        </TabsContent>
+
+        <TabsContent value="funnel">
+          <FunnelSection funnel={data.funnel} period={data.period} segment={data.segment} />
         </TabsContent>
 
         <TabsContent value="content" className="space-y-4">

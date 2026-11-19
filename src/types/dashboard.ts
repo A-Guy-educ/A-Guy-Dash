@@ -397,6 +397,56 @@ export interface B2BMetrics {
   perSchool: B2BSchoolRow[]
 }
 
+/**
+ * Visitor → signup → first week → payment funnel (Web PR #1631). Follows
+ * `period` and `segment` like the other blocks. Every value is a count of
+ * distinct sessions (visitor steps) or students (signup / payment steps).
+ *
+ * Paywall / pricing / checkout events only exist from `eventsTrackedSince`
+ * (YYYY-MM-DD); windows starting earlier undercount them. "Returned" = active
+ * again between 24h and 7 days after signup, so very recent signups haven't
+ * had their full week yet. Visitor steps are anonymous sessions and can't be
+ * segmented. Schema defaults every count to 0 for a Web deploy without it.
+ */
+export interface VisitorFunnel {
+  visitors: number
+  humans: number
+  signupPromptShown: number
+  googleClicked: number
+  signedUp: number
+}
+
+export interface SignupFunnel {
+  signedUp: number
+  activeFirstWeek: number
+  returnedFirstWeek: number
+  paywallShown: number
+  pricingViewed: number
+  checkoutStarted: number
+  paid: number
+}
+
+export type FunnelSourceKey = keyof SignupSourceBreakdown
+export type FunnelLandingKey = LandingType | 'unknown'
+
+export interface PaymentFunnel {
+  paywallShown: number
+  paywallByGate: { lesson: number; exercise: number; ai_quota: number }
+  pricingViewed: number
+  checkoutStarted: number
+  paid: number
+}
+
+export interface FunnelMetrics {
+  eventsTrackedSince: string | null
+  visitors: VisitorFunnel
+  visitorsByLandingType: Record<LandingType, VisitorFunnel>
+  signups: SignupFunnel
+  bySource: Record<FunnelSourceKey, SignupFunnel>
+  byLandingType: Record<FunnelLandingKey, SignupFunnel>
+  payments: PaymentFunnel
+}
+
 export interface DashboardMetricsResponse {
   period: Period
   segment: Segment
@@ -409,11 +459,13 @@ export interface DashboardMetricsResponse {
   productHealth?: ProductHealth
   guestInsights: GuestInsights
   b2bMetrics?: B2BMetrics
+  funnel: FunnelMetrics
 }
 
 export {
   b2bMetricsSchema,
   dashboardMetricsSchema,
+  funnelSchema,
   guestInsightsSchema,
   LANDING_TYPES,
   productHealthSchema,
