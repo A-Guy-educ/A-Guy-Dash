@@ -41,6 +41,7 @@
     "tabs": {
       "productHealth": "בריאות המוצר",
       "users": "משתמשים",
+      "funnel": "משפך",
       "content": "תוכן",
       "engagement": "מעורבות",
       "tokens": "טוקנים",
@@ -157,6 +158,52 @@
       "returningHintSuffix": "משתמשים שנרשמו לפני התקופה",
       "returnedOnce": "חזרו לפחות פעם",
       "returnedMultiple": "חזרו יותר מפעמיים"
+    },
+    "funnel": {
+      "section": "משפך",
+      "emptyState": "אין עדיין נתוני משפך.",
+      "visitorsTitle": "מבקרים ← הרשמה",
+      "signupsTitle": "נרשמים חדשים ← שבוע ראשון",
+      "paymentsTitle": "תלמידים ← תשלום",
+      "bySourceTitle": "לפי מקור",
+      "byLandingTitle": "לפי עמוד נחיתה",
+      "visitorsByLandingTitle": "מבקרים לפי עמוד נחיתה",
+      "likelyBots": "כולל {n} בוטים סבירים",
+      "ofHumans": "מהמבקרים האנושיים",
+      "ofSignedUp": "מהנרשמים",
+      "trackingNote": "המעקב התחיל ב-{date}; פעילות מוקדמת יותר לא נספרת.",
+      "anonymousNote": "ספירת המבקרים כוללת סשנים אנונימיים, שאי אפשר לשייך לפלח עד שהם נרשמים.",
+      "returnedTooltip": "פעיל שוב בין 24 שעות ל-7 ימים אחרי ההרשמה.",
+      "returnedTooltipShort": "לנרשמים מ-7 הימים האחרונים עוד לא עבר שבוע מלא, ולכן השיעור נמוך ביום / שבוע.",
+      "gateNote": "לפי חסימה (תלמיד יכול להופיע ביותר מאחת):",
+      "noRows": "אין הרשמות בתקופה זו",
+      "rowKey": "מפתח",
+      "steps": {
+        "visitors": "מבקרים",
+        "humans": "מבקרים אנושיים",
+        "signupPromptShown": "ראו הצעת הרשמה",
+        "googleClicked": "לחצו על Google",
+        "signedUp": "נרשמו",
+        "activeFirstWeek": "פעילים בשבוע הראשון",
+        "returnedFirstWeek": "חזרו בשבוע הראשון",
+        "paywallShown": "נתקלו בחסימת תשלום",
+        "pricingViewed": "צפו במחירים",
+        "checkoutStarted": "התחילו תשלום",
+        "paid": "שילמו"
+      },
+      "gates": {
+        "lesson": "שיעור",
+        "exercise": "תרגיל",
+        "ai_quota": "מכסת AI"
+      },
+      "landingTypes": {
+        "lesson": "שיעור",
+        "course": "קורס",
+        "start": "/start",
+        "home": "בית",
+        "other": "אחר",
+        "unknown": "לא ידוע"
+      }
     },
     "b2b": {
       "section": "בתי ספר",

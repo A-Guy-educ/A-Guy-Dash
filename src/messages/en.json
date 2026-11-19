@@ -41,6 +41,7 @@
     "tabs": {
       "productHealth": "Product Health",
       "users": "Users",
+      "funnel": "Funnel",
       "content": "Content",
       "engagement": "Engagement",
       "tokens": "Tokens",
@@ -157,6 +158,52 @@
       "returningHintSuffix": "pre-period users",
       "returnedOnce": "Returned once",
       "returnedMultiple": "Returned >2x"
+    },
+    "funnel": {
+      "section": "Funnel",
+      "emptyState": "No funnel data yet.",
+      "visitorsTitle": "Visitors → signup",
+      "signupsTitle": "New signups → first week",
+      "paymentsTitle": "Students → payment",
+      "bySourceTitle": "By source",
+      "byLandingTitle": "By landing page",
+      "visitorsByLandingTitle": "Visitors by landing page",
+      "likelyBots": "incl. {n} likely bots",
+      "ofHumans": "of human visitors",
+      "ofSignedUp": "of signups",
+      "trackingNote": "Tracking started {date}; earlier activity isn't counted.",
+      "anonymousNote": "Visitor counts include anonymous sessions, which can't be classified by segment until they sign up.",
+      "returnedTooltip": "Active again between 24h and 7 days after signup.",
+      "returnedTooltipShort": "Signups from the last 7 days haven't had a full week yet, so this rate reads low on Day / Week.",
+      "gateNote": "By gate (a student can hit more than one):",
+      "noRows": "No signups in this period",
+      "rowKey": "Key",
+      "steps": {
+        "visitors": "Visitors",
+        "humans": "Human visitors",
+        "signupPromptShown": "Saw signup prompt",
+        "googleClicked": "Clicked Google",
+        "signedUp": "Signed up",
+        "activeFirstWeek": "Active in first week",
+        "returnedFirstWeek": "Returned in first week",
+        "paywallShown": "Hit paywall",
+        "pricingViewed": "Viewed pricing",
+        "checkoutStarted": "Started checkout",
+        "paid": "Paid"
+      },
+      "gates": {
+        "lesson": "Lesson",
+        "exercise": "Exercise",
+        "ai_quota": "AI quota"
+      },
+      "landingTypes": {
+        "lesson": "Lesson",
+        "course": "Course",
+        "start": "/start",
+        "home": "Home",
+        "other": "Other",
+        "unknown": "Unknown"
+      }
     },
     "b2b": {
       "section": "Schools",

@@ -33,6 +33,36 @@ const EMPTY_GUEST_INSIGHTS = {
   },
 }
 
+describe('funnel', () => {
+  it('defaults to all zeros when an older Web omits it', () => {
+    const older: Partial<ReturnType<typeof dashboardFixture>> = dashboardFixture()
+    delete older.funnel
+    const { funnel } = dashboardMetricsSchema.parse(older)
+    expect(funnel.eventsTrackedSince).toBeNull()
+    expect(funnel.visitors.humans).toBe(0)
+    expect(funnel.bySource.google.paid).toBe(0)
+    expect(funnel.byLandingType.unknown.signedUp).toBe(0)
+    expect(funnel.payments.paywallByGate.ai_quota).toBe(0)
+  })
+
+  it('fills missing keys inside a partial funnel', () => {
+    const { funnel } = dashboardMetricsSchema.parse({
+      ...dashboardFixture(),
+      funnel: {
+        eventsTrackedSince: '2026-11-18',
+        signups: { signedUp: 10, paid: 1 },
+        bySource: { google: { signedUp: 4 } },
+        payments: { paywallByGate: { lesson: 3 } },
+      },
+    })
+    expect(funnel.eventsTrackedSince).toBe('2026-11-18')
+    expect(funnel.signups).toMatchObject({ signedUp: 10, paid: 1, activeFirstWeek: 0 })
+    expect(funnel.bySource.google).toMatchObject({ signedUp: 4, paid: 0 })
+    expect(funnel.bySource.direct.signedUp).toBe(0)
+    expect(funnel.payments.paywallByGate).toEqual({ lesson: 3, exercise: 0, ai_quota: 0 })
+  })
+})
+
 describe('segment', () => {
   it("defaults to 'all' when an older Web omits it", () => {
     const older: Partial<ReturnType<typeof dashboardFixture>> = dashboardFixture()
