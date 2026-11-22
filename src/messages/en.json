@@ -173,7 +173,7 @@
       "ofSignedUp": "of signups",
       "trackingNote": "Tracking started {date}; earlier activity isn't counted.",
       "anonymousNote": "Visitor counts include anonymous sessions, which can't be classified by segment until they sign up.",
-      "returnedTooltip": "Active again between 24h and 7 days after signup.",
+      "returnedTooltip": "Did something again on a later day in the first week.",
       "returnedTooltipShort": "Signups from the last 7 days haven't had a full week yet, so this rate reads low on Day / Week.",
       "gateNote": "By gate (a student can hit more than one):",
       "noRows": "No signups in this period",
@@ -184,8 +184,10 @@
         "signupPromptShown": "Saw signup prompt",
         "googleClicked": "Clicked Google",
         "signedUp": "Signed up",
-        "activeFirstWeek": "Active in first week",
-        "returnedFirstWeek": "Returned in first week",
+        "activeFirstWeek": "Alive",
+        "engagedFirstWeek": "Did something",
+        "returnedFirstWeek": "Came back",
+        "avgDays": "Avg days",
         "paywallShown": "Hit paywall",
         "pricingViewed": "Viewed pricing",
         "checkoutStarted": "Started checkout",
@@ -203,7 +205,13 @@
         "home": "Home",
         "other": "Other",
         "unknown": "Unknown"
-      }
+      },
+      "aliveTooltip": "Opened any lesson or answered a question in the first 7 days.",
+      "engagedTooltip": "60s+ in a lesson or answered a question.",
+      "activeDaysTitle": "Days active in first week",
+      "avgDays": "avg {n} days",
+      "daysAxis": "x = days active, y = students",
+      "weekCompletedCaption": "Students whose first week is over ({n})"
     },
     "b2b": {
       "section": "Schools",

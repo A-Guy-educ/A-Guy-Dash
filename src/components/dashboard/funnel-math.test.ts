@@ -1,6 +1,16 @@
 import { describe, expect, it } from 'vitest'
 
-import { periodStartYmd, startsBeforeTracking } from './funnel-math'
+import { avgActiveDays, formatAvgDays, periodStartYmd, startsBeforeTracking } from './funnel-math'
+
+describe('avgActiveDays', () => {
+  it('divides active days by completed weeks', () => {
+    expect(formatAvgDays(avgActiveDays({ activeDaysFirstWeek: 25, weekCompleted: 10 }))).toBe('2.5')
+  })
+
+  it('renders — when no signup has finished their first week', () => {
+    expect(formatAvgDays(avgActiveDays({ activeDaysFirstWeek: 0, weekCompleted: 0 }))).toBe('—')
+  })
+})
 
 // Local noon avoids any DST edge around midnight.
 const NOW = new Date(2026, 10, 19, 12, 0, 0)

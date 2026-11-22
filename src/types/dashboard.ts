@@ -404,8 +404,11 @@ export interface B2BMetrics {
  *
  * Paywall / pricing / checkout events only exist from `eventsTrackedSince`
  * (YYYY-MM-DD); windows starting earlier undercount them. "Returned" = active
- * again between 24h and 7 days after signup, so very recent signups haven't
- * had their full week yet. Visitor steps are anonymous sessions and can't be
+ * = did something (engaged) again on a later day in the first week, so very
+ * recent signups haven't had their full week yet. First-week depth (Web PR
+ * #1639): `weekCompleted` = signups whose first week is over;
+ * `activeDaysFirstWeek` sums their active days; `firstWeekActiveDays[d]` =
+ * how many of them were active on exactly d days (0–7). Visitor steps are anonymous sessions and can't be
  * segmented. Schema defaults every count to 0 for a Web deploy without it.
  */
 export interface VisitorFunnel {
@@ -419,7 +422,10 @@ export interface VisitorFunnel {
 export interface SignupFunnel {
   signedUp: number
   activeFirstWeek: number
+  engagedFirstWeek: number
   returnedFirstWeek: number
+  weekCompleted: number
+  activeDaysFirstWeek: number
   paywallShown: number
   pricingViewed: number
   checkoutStarted: number
@@ -442,6 +448,7 @@ export interface FunnelMetrics {
   visitors: VisitorFunnel
   visitorsByLandingType: Record<LandingType, VisitorFunnel>
   signups: SignupFunnel
+  firstWeekActiveDays: number[]
   bySource: Record<FunnelSourceKey, SignupFunnel>
   byLandingType: Record<FunnelLandingKey, SignupFunnel>
   payments: PaymentFunnel

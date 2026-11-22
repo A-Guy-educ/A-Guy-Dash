@@ -157,7 +157,10 @@ const signupFunnelSchema = z
   .object({
     signedUp: count,
     activeFirstWeek: count,
+    engagedFirstWeek: count,
     returnedFirstWeek: count,
+    weekCompleted: count,
+    activeDaysFirstWeek: count,
     paywallShown: count,
     pricingViewed: count,
     checkoutStarted: count,
@@ -179,6 +182,12 @@ export const funnelSchema = z
       })
       .prefault({}),
     signups: signupFunnelSchema,
+    // Index = days active (0–7). Normalised to exactly 8 buckets so the chart
+    // never renders a ragged axis if Web sends a short or long array.
+    firstWeekActiveDays: z
+      .array(z.number())
+      .default([])
+      .transform((days) => Array.from({ length: 8 }, (_, i) => days[i] ?? 0)),
     bySource: z
       .object({
         google: signupFunnelSchema,
