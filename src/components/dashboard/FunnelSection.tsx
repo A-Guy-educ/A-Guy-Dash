@@ -7,7 +7,10 @@
  * - payment-side events only exist from `eventsTrackedSince`, so windows
  *   that open earlier get a note on the payment card and the
  *   paywall / pricing / checkout columns;
- * - "returned" needs a full week after signup, so it reads low on day/week;
+ * - "came back" needs a full week after signup, so it reads low on day/week;
+ * - first-week depth (Web #1639): Alive → Did something → Came back bars,
+ *   a days-active histogram and per-row avg days, all over signups whose
+ *   first week is over (`weekCompleted`);
  * - visitor steps are anonymous and can't be segmented.
  *
  * @fileType component
@@ -30,7 +33,7 @@ import type {
   SignupFunnel,
   VisitorFunnel,
 } from '@/types/dashboard'
-import { startsBeforeTracking } from './funnel-math'
+import { avgActiveDays, formatAvgDays, startsBeforeTracking } from './funnel-math'
 import { formatPercent, percentOf } from './guest-insights-math'
 import { FormulaTooltip } from './product-health/FormulaTooltip'
 
@@ -44,27 +47,34 @@ const VISITOR_STEPS = [
 const FIRST_WEEK_STEPS = [
   'signedUp',
   'activeFirstWeek',
+  'engagedFirstWeek',
   'returnedFirstWeek',
 ] as const satisfies readonly (keyof SignupFunnel)[]
 
 const PAYMENT_STEPS = ['paywallShown', 'pricingViewed', 'checkoutStarted', 'paid'] as const
 
+// `avgDays` is derived per row (activeDaysFirstWeek / weekCompleted).
 const SIGNUP_COLUMNS = [
   'signedUp',
   'activeFirstWeek',
+  'engagedFirstWeek',
   'returnedFirstWeek',
+  'avgDays',
   'paywallShown',
   'pricingViewed',
   'checkoutStarted',
   'paid',
-] as const satisfies readonly (keyof SignupFunnel)[]
+] as const satisfies readonly (keyof SignupFunnel | 'avgDays')[]
+
+// Tooltip text per first-week step; `returned` gets a day/week caveat.
+const STEP_TOOLTIPS: Partial<Record<string, string>> = {
+  activeFirstWeek: 'aliveTooltip',
+  engagedFirstWeek: 'engagedTooltip',
+  returnedFirstWeek: 'returnedTooltip',
+}
 
 // Columns backed by events that only exist from `eventsTrackedSince`.
-const TRACKED_COLUMNS = new Set<keyof SignupFunnel>([
-  'paywallShown',
-  'pricingViewed',
-  'checkoutStarted',
-])
+const TRACKED_COLUMNS = new Set<string>(['paywallShown', 'pricingViewed', 'checkoutStarted'])
 
 const VISITOR_COLUMNS = [
   'visitors',
@@ -111,12 +121,12 @@ export function FunnelSection({ funnel, period, segment }: Props) {
       : t('returnedTooltip')
   const likelyBots = Math.max(0, funnel.visitors.visitors - funnel.visitors.humans)
 
-  const stepLabel = (step: string) =>
-    step === 'returnedFirstWeek' ? (
-      <FormulaTooltip content={returnedTooltip}>{t(`steps.${step}`)}</FormulaTooltip>
-    ) : (
-      t(`steps.${step}`)
-    )
+  const stepLabel = (step: string) => {
+    const tooltipKey = STEP_TOOLTIPS[step]
+    if (!tooltipKey) return t(`steps.${step}`)
+    const content = step === 'returnedFirstWeek' ? returnedTooltip : t(tooltipKey)
+    return <FormulaTooltip content={content}>{t(`steps.${step}`)}</FormulaTooltip>
+  }
 
   return (
     <section className="space-y-6">
@@ -184,6 +194,12 @@ export function FunnelSection({ funnel, period, segment }: Props) {
           }
         />
       </div>
+
+      <ActiveDaysCard
+        days={funnel.firstWeekActiveDays}
+        avg={avgActiveDays(funnel.signups)}
+        weekCompleted={funnel.signups.weekCompleted}
+      />
 
       <BreakdownTable
         title={t('bySourceTitle')}
@@ -325,6 +341,62 @@ function FunnelCard({
   )
 }
 
+function ActiveDaysCard({
+  days,
+  avg,
+  weekCompleted,
+}: {
+  days: number[]
+  avg: number | null
+  weekCompleted: number
+}) {
+  const t = useTranslations('dashboard.funnel')
+  const locale = useLocale()
+  const max = days.reduce((m, n) => Math.max(m, n), 0)
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-baseline justify-between gap-content-gap flex-wrap">
+        <CardTitle className="text-heading-md">{t('activeDaysTitle')}</CardTitle>
+        <span className="text-body-sm text-muted-foreground">
+          {t('avgDays').replace('{n}', formatAvgDays(avg))}
+        </span>
+      </CardHeader>
+      <CardContent className="pt-0 space-y-3">
+        {weekCompleted === 0 ? (
+          <p className="text-body-sm text-muted-foreground">{t('emptyState')}</p>
+        ) : (
+          <ul className="grid grid-cols-8 gap-content-gap-xs items-end h-40">
+            {days.map((count, dayCount) => {
+              const heightPct = max > 0 ? (count / max) * 100 : 0
+              return (
+                <li key={dayCount} className="flex flex-col items-center justify-end h-full">
+                  <span className="text-body-xs font-semibold tabular-nums">
+                    {count.toLocaleString(locale)}
+                  </span>
+                  <div
+                    className="w-full bg-primary/80 hover:bg-primary rounded-sm transition-all"
+                    style={{ height: `${heightPct}%`, minHeight: count > 0 ? 4 : 0 }}
+                    title={`${dayCount}: ${count.toLocaleString(locale)}`}
+                    aria-label={`${dayCount}: ${count}`}
+                  />
+                  <span className="mt-1 text-body-xs text-muted-foreground tabular-nums">
+                    {dayCount}
+                  </span>
+                </li>
+              )
+            })}
+          </ul>
+        )}
+        <p className="text-body-xs text-muted-foreground">
+          {t('daysAxis')} ·{' '}
+          {t('weekCompletedCaption').replace('{n}', weekCompleted.toLocaleString(locale))}
+        </p>
+      </CardContent>
+    </Card>
+  )
+}
+
 function BreakdownTable({
   title,
   rows,
@@ -369,16 +441,22 @@ function BreakdownTable({
                 {visible.map(({ key, label, row }) => (
                   <tr key={key} className="border-t border-border">
                     <td className="py-2">{label}</td>
-                    {SIGNUP_COLUMNS.map((col) => (
-                      <td key={col} className="py-2 ps-3 text-end tabular-nums">
-                        {row[col].toLocaleString(locale)}
-                        {col !== 'signedUp' && (
-                          <span className="ms-1 text-body-xs text-muted-foreground">
-                            {formatPercent(percentOf(row[col], row.signedUp))}
-                          </span>
-                        )}
-                      </td>
-                    ))}
+                    {SIGNUP_COLUMNS.map((col) =>
+                      col === 'avgDays' ? (
+                        <td key={col} className="py-2 ps-3 text-end tabular-nums">
+                          {formatAvgDays(avgActiveDays(row))}
+                        </td>
+                      ) : (
+                        <td key={col} className="py-2 ps-3 text-end tabular-nums">
+                          {row[col].toLocaleString(locale)}
+                          {col !== 'signedUp' && (
+                            <span className="ms-1 text-body-xs text-muted-foreground">
+                              {formatPercent(percentOf(row[col], row.signedUp))}
+                            </span>
+                          )}
+                        </td>
+                      ),
+                    )}
                   </tr>
                 ))}
               </tbody>

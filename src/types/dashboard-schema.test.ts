@@ -43,6 +43,20 @@ describe('funnel', () => {
     expect(funnel.bySource.google.paid).toBe(0)
     expect(funnel.byLandingType.unknown.signedUp).toBe(0)
     expect(funnel.payments.paywallByGate.ai_quota).toBe(0)
+    expect(funnel.firstWeekActiveDays).toEqual([0, 0, 0, 0, 0, 0, 0, 0])
+    expect(funnel.signups).toMatchObject({
+      engagedFirstWeek: 0,
+      weekCompleted: 0,
+      activeDaysFirstWeek: 0,
+    })
+  })
+
+  it('normalises firstWeekActiveDays to exactly 8 buckets', () => {
+    const parse = (firstWeekActiveDays: number[]) =>
+      dashboardMetricsSchema.parse({ ...dashboardFixture(), funnel: { firstWeekActiveDays } })
+        .funnel.firstWeekActiveDays
+    expect(parse([5, 4, 3])).toEqual([5, 4, 3, 0, 0, 0, 0, 0])
+    expect(parse([1, 1, 1, 1, 1, 1, 1, 1, 9])).toEqual([1, 1, 1, 1, 1, 1, 1, 1])
   })
 
   it('fills missing keys inside a partial funnel', () => {

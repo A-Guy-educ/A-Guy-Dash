@@ -21,6 +21,18 @@ export function periodStartYmd(period: Period, now: Date = new Date()): string {
   return ymd(d)
 }
 
+/**
+ * Average active days in the first week over signups whose week is over, or
+ * null when none have finished it yet (renders as "—").
+ */
+export function avgActiveDays(row: { activeDaysFirstWeek: number; weekCompleted: number }) {
+  return row.weekCompleted > 0 ? row.activeDaysFirstWeek / row.weekCompleted : null
+}
+
+export function formatAvgDays(value: number | null): string {
+  return value === null ? '—' : value.toFixed(1)
+}
+
 /** True when the period window opens before funnel event tracking began. */
 export function startsBeforeTracking(
   period: Period,

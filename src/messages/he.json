@@ -173,7 +173,7 @@
       "ofSignedUp": "מהנרשמים",
       "trackingNote": "המעקב התחיל ב-{date}; פעילות מוקדמת יותר לא נספרת.",
       "anonymousNote": "ספירת המבקרים כוללת סשנים אנונימיים, שאי אפשר לשייך לפלח עד שהם נרשמים.",
-      "returnedTooltip": "פעיל שוב בין 24 שעות ל-7 ימים אחרי ההרשמה.",
+      "returnedTooltip": "עשו משהו שוב ביום מאוחר יותר בשבוע הראשון.",
       "returnedTooltipShort": "לנרשמים מ-7 הימים האחרונים עוד לא עבר שבוע מלא, ולכן השיעור נמוך ביום / שבוע.",
       "gateNote": "לפי חסימה (תלמיד יכול להופיע ביותר מאחת):",
       "noRows": "אין הרשמות בתקופה זו",
@@ -184,8 +184,10 @@
         "signupPromptShown": "ראו הצעת הרשמה",
         "googleClicked": "לחצו על Google",
         "signedUp": "נרשמו",
-        "activeFirstWeek": "פעילים בשבוע הראשון",
-        "returnedFirstWeek": "חזרו בשבוע הראשון",
+        "activeFirstWeek": "בחיים",
+        "engagedFirstWeek": "עשו משהו",
+        "returnedFirstWeek": "חזרו",
+        "avgDays": "ממוצע ימים",
         "paywallShown": "נתקלו בחסימת תשלום",
         "pricingViewed": "צפו במחירים",
         "checkoutStarted": "התחילו תשלום",
@@ -203,7 +205,13 @@
         "home": "בית",
         "other": "אחר",
         "unknown": "לא ידוע"
-      }
+      },
+      "aliveTooltip": "פתחו שיעור כלשהו או ענו על שאלה ב-7 הימים הראשונים.",
+      "engagedTooltip": "60 שניות ומעלה בשיעור או מענה על שאלה.",
+      "activeDaysTitle": "ימי פעילות בשבוע הראשון",
+      "avgDays": "ממוצע {n} ימים",
+      "daysAxis": "x = ימי פעילות, y = תלמידים",
+      "weekCompletedCaption": "תלמידים שהשבוע הראשון שלהם הסתיים ({n})"
     },
     "b2b": {
       "section": "בתי ספר",
