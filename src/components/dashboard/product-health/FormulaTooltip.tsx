@@ -31,13 +31,15 @@ interface FormulaTooltipProps {
   children: React.ReactNode
   content: string
   className?: string
+  /** Bare block anchor (no dotted underline) — e.g. a chart segment. */
+  plain?: boolean
 }
 
 // Matches `max-w-xs` (20rem) plus a small viewport margin.
 const BUBBLE_MAX_WIDTH = 320
 const VIEWPORT_MARGIN = 8
 
-export function FormulaTooltip({ children, content, className }: FormulaTooltipProps) {
+export function FormulaTooltip({ children, content, className, plain }: FormulaTooltipProps) {
   const [position, setPosition] = useState<{ top: number; left: number } | null>(null)
   const anchorRef = useRef<HTMLSpanElement>(null)
   const id = useId()
@@ -71,7 +73,11 @@ export function FormulaTooltip({ children, content, className }: FormulaTooltipP
         ref={anchorRef}
         tabIndex={0}
         aria-describedby={position ? id : undefined}
-        className="cursor-help underline decoration-dotted decoration-muted-foreground/60 underline-offset-2"
+        className={
+          plain
+            ? 'block h-full w-full cursor-help'
+            : 'cursor-help underline decoration-dotted decoration-muted-foreground/60 underline-offset-2'
+        }
       >
         {children}
       </span>

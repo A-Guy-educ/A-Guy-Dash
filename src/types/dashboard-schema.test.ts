@@ -51,6 +51,24 @@ describe('funnel', () => {
     })
   })
 
+  it('defaults payment fields and every wall row to zeros', () => {
+    const { funnel } = dashboardMetricsSchema.parse({
+      ...dashboardFixture(),
+      funnel: { payments: { planSelected: 4, byGate: { ai_quota: { students: 9, hits: 20 } } } },
+    })
+    expect(funnel.payments).toMatchObject({ planSelected: 4, paywallDismissed: 0, paid: 0 })
+    expect(funnel.payments.byGate.ai_quota).toEqual({
+      students: 9,
+      hits: 20,
+      repeatStudents: 0,
+      dismissedStudents: 0,
+      decidedPlan: 0,
+      decidedPaid: 0,
+    })
+    expect(funnel.payments.byGate.lesson.students).toBe(0)
+    expect(funnel.payments.byGate.exercise.decidedPaid).toBe(0)
+  })
+
   it('normalises firstWeekActiveDays to exactly 8 buckets', () => {
     const parse = (firstWeekActiveDays: number[]) =>
       dashboardMetricsSchema.parse({ ...dashboardFixture(), funnel: { firstWeekActiveDays } })
