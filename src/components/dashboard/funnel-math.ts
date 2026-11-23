@@ -1,4 +1,4 @@
-import type { Period } from '@/types/dashboard'
+import type { Period, WallGate, WallGateStats } from '@/types/dashboard'
 
 function ymd(date: Date): string {
   const y = date.getFullYear()
@@ -21,18 +21,6 @@ export function periodStartYmd(period: Period, now: Date = new Date()): string {
   return ymd(d)
 }
 
-/**
- * Average active days in the first week over signups whose week is over, or
- * null when none have finished it yet (renders as "—").
- */
-export function avgActiveDays(row: { activeDaysFirstWeek: number; weekCompleted: number }) {
-  return row.weekCompleted > 0 ? row.activeDaysFirstWeek / row.weekCompleted : null
-}
-
-export function formatAvgDays(value: number | null): string {
-  return value === null ? '—' : value.toFixed(1)
-}
-
 /** True when the period window opens before funnel event tracking began. */
 export function startsBeforeTracking(
   period: Period,
@@ -41,4 +29,30 @@ export function startsBeforeTracking(
 ): boolean {
   if (!eventsTrackedSince) return false
   return periodStartYmd(period, now) < eventsTrackedSince
+}
+
+export const WALL_GATES: readonly WallGate[] = ['ai_quota', 'lesson', 'exercise']
+
+/** Gates ordered by students hit, descending (stable for ties). */
+export function gatesByStudents(byGate: Record<WallGate, WallGateStats>): WallGate[] {
+  return [...WALL_GATES].sort((a, b) => byGate[b].students - byGate[a].students)
+}
+
+/**
+ * Non-overlapping outcome split for one wall's stacked bar. Clamped so a
+ * cohort edge (e.g. decidedPaid > decidedPlan) never produces a negative or
+ * double-counted segment; the three parts sum to `students` whenever the
+ * decided counts fit inside it.
+ */
+export function wallSegments(row: WallGateStats) {
+  return {
+    paid: row.decidedPaid,
+    planNoPay: Math.max(row.decidedPlan - row.decidedPaid, 0),
+    noPlan: Math.max(row.students - Math.max(row.decidedPlan, row.decidedPaid), 0),
+  }
+}
+
+/** hits / students to 1 decimal, or "—" when nobody hit the wall. */
+export function formatRatio(part: number, whole: number): string {
+  return whole > 0 ? (part / whole).toFixed(1) : '—'
 }

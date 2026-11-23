@@ -163,40 +163,56 @@
       "section": "Funnel",
       "emptyState": "No funnel data yet.",
       "visitorsTitle": "Visitors → signup",
+      "visitorsByLandingTitle": "Visitors by landing page",
       "signupsTitle": "New signups → first week",
-      "paymentsTitle": "Students → payment",
+      "activeDaysTitle": "Days active in first week",
       "bySourceTitle": "By source",
       "byLandingTitle": "By landing page",
-      "visitorsByLandingTitle": "Visitors by landing page",
+      "paymentsTitle": "Students → payment",
+      "paymentsScope": "Every student active in the period, not only new signups (walls start at the 4th lesson).",
+      "wallsChartTitle": "What happened after each wall",
+      "wallsTableTitle": "Walls",
       "likelyBots": "incl. {n} likely bots",
-      "ofHumans": "of human visitors",
+      "ofHumans": "of real visitors",
       "ofSignedUp": "of signups",
-      "trackingNote": "Tracking started {date}; earlier activity isn't counted.",
+      "ofPaywall": "of students who hit a wall",
+      "trackingNote": "Wall, plan and checkout tracking started {date}; earlier activity isn't counted.",
       "anonymousNote": "Visitor counts include anonymous sessions, which can't be classified by segment until they sign up.",
-      "returnedTooltip": "Did something again on a later day in the first week.",
-      "returnedTooltipShort": "Signups from the last 7 days haven't had a full week yet, so this rate reads low on Day / Week.",
-      "gateNote": "By gate (a student can hit more than one):",
+      "firstWeekNote": "Signups from the last 7 days haven't had a full week yet, so these rates read low on Day/Week.",
+      "daysAxis": "x = days active (0–7), y = students",
+      "weekCompletedCaption": "Students whose first week is over ({n})",
       "noRows": "No signups in this period",
-      "rowKey": "Key",
+      "rowKey": "",
       "steps": {
-        "visitors": "Visitors",
-        "humans": "Human visitors",
+        "humans": "Real visitors",
         "signupPromptShown": "Saw signup prompt",
         "googleClicked": "Clicked Google",
         "signedUp": "Signed up",
         "activeFirstWeek": "Alive",
         "engagedFirstWeek": "Did something",
         "returnedFirstWeek": "Came back",
-        "avgDays": "Avg days",
-        "paywallShown": "Hit paywall",
-        "pricingViewed": "Viewed pricing",
+        "paywallShown": "Hit a wall",
+        "planSelected": "Picked a plan",
         "checkoutStarted": "Started checkout",
         "paid": "Paid"
       },
-      "gates": {
-        "lesson": "Lesson",
-        "exercise": "Exercise",
-        "ai_quota": "AI quota"
+      "tooltips": {
+        "activeFirstWeek": "Opened any lesson or answered a question in the first 7 days.",
+        "engagedFirstWeek": "60s+ in a lesson, or answered a question, in the first 7 days.",
+        "returnedFirstWeek": "Did something again on a later day in the first week (24h+ after signup).",
+        "planSelected": "Clicked a plan on an upgrade wall, or Subscribe on the plans page.",
+        "afterIt": "Credited to the last wall the student hit before picking a plan / paying. Each student counts under one wall."
+      },
+      "sideStats": {
+        "paywallDismissed": "Continued without help",
+        "pricingViewed": "Opened plans page"
+      },
+      "sources": {
+        "google": "Google",
+        "guykoren": "Guy Koren",
+        "direct": "Direct",
+        "other": "Other",
+        "unknown": "Unknown"
       },
       "landingTypes": {
         "lesson": "Lesson",
@@ -206,12 +222,28 @@
         "other": "Other",
         "unknown": "Unknown"
       },
-      "aliveTooltip": "Opened any lesson or answered a question in the first 7 days.",
-      "engagedTooltip": "60s+ in a lesson or answered a question.",
-      "activeDaysTitle": "Days active in first week",
-      "avgDays": "avg {n} days",
-      "daysAxis": "x = days active, y = students",
-      "weekCompletedCaption": "Students whose first week is over ({n})"
+      "gates": {
+        "ai_quota": "AI quota (daily limit)",
+        "lesson": "Locked lesson (practice/exam)",
+        "exercise": "Exercise lock (4th+ exercise)"
+      },
+      "wallSegments": {
+        "paid": "Paid after it",
+        "planNoPay": "Picked a plan, didn't pay",
+        "noPlan": "Didn't pick a plan",
+        "ofWall": "of this wall's students"
+      },
+      "wallColumns": {
+        "gate": "Wall",
+        "students": "Students hit",
+        "hits": "Total hits",
+        "hitsPerStudent": "Hits / student",
+        "repeat": "Hit 2+ times",
+        "dismissed": "Continued without help",
+        "decidedPlan": "Picked a plan after it",
+        "decidedPaid": "Paid after it",
+        "paidPerHit": "Paid / hit"
+      }
     },
     "b2b": {
       "section": "Schools",

@@ -163,40 +163,56 @@
       "section": "משפך",
       "emptyState": "אין עדיין נתוני משפך.",
       "visitorsTitle": "מבקרים ← הרשמה",
+      "visitorsByLandingTitle": "מבקרים לפי עמוד נחיתה",
       "signupsTitle": "נרשמים חדשים ← שבוע ראשון",
-      "paymentsTitle": "תלמידים ← תשלום",
+      "activeDaysTitle": "ימי פעילות בשבוע הראשון",
       "bySourceTitle": "לפי מקור",
       "byLandingTitle": "לפי עמוד נחיתה",
-      "visitorsByLandingTitle": "מבקרים לפי עמוד נחיתה",
+      "paymentsTitle": "תלמידים ← תשלום",
+      "paymentsScope": "כל התלמידים שהיו פעילים בתקופה, לא רק נרשמים חדשים (החסימות מתחילות בשיעור הרביעי).",
+      "wallsChartTitle": "מה קרה אחרי כל חסימה",
+      "wallsTableTitle": "חסימות",
       "likelyBots": "כולל {n} בוטים סבירים",
-      "ofHumans": "מהמבקרים האנושיים",
+      "ofHumans": "מהמבקרים האמיתיים",
       "ofSignedUp": "מהנרשמים",
-      "trackingNote": "המעקב התחיל ב-{date}; פעילות מוקדמת יותר לא נספרת.",
+      "ofPaywall": "מהתלמידים שנתקלו בחסימה",
+      "trackingNote": "המעקב אחרי חסימות, תוכניות ותשלומים התחיל ב-{date}; פעילות מוקדמת יותר לא נספרת.",
       "anonymousNote": "ספירת המבקרים כוללת סשנים אנונימיים, שאי אפשר לשייך לפלח עד שהם נרשמים.",
-      "returnedTooltip": "עשו משהו שוב ביום מאוחר יותר בשבוע הראשון.",
-      "returnedTooltipShort": "לנרשמים מ-7 הימים האחרונים עוד לא עבר שבוע מלא, ולכן השיעור נמוך ביום / שבוע.",
-      "gateNote": "לפי חסימה (תלמיד יכול להופיע ביותר מאחת):",
+      "firstWeekNote": "לנרשמים מ-7 הימים האחרונים עוד לא עבר שבוע מלא, ולכן השיעורים נמוכים ביום/שבוע.",
+      "daysAxis": "x = ימי פעילות (0–7), y = תלמידים",
+      "weekCompletedCaption": "תלמידים שהשבוע הראשון שלהם הסתיים ({n})",
       "noRows": "אין הרשמות בתקופה זו",
-      "rowKey": "מפתח",
+      "rowKey": "",
       "steps": {
-        "visitors": "מבקרים",
-        "humans": "מבקרים אנושיים",
+        "humans": "מבקרים אמיתיים",
         "signupPromptShown": "ראו הצעת הרשמה",
         "googleClicked": "לחצו על Google",
         "signedUp": "נרשמו",
         "activeFirstWeek": "בחיים",
         "engagedFirstWeek": "עשו משהו",
         "returnedFirstWeek": "חזרו",
-        "avgDays": "ממוצע ימים",
-        "paywallShown": "נתקלו בחסימת תשלום",
-        "pricingViewed": "צפו במחירים",
+        "paywallShown": "נתקלו בחסימה",
+        "planSelected": "בחרו תוכנית",
         "checkoutStarted": "התחילו תשלום",
         "paid": "שילמו"
       },
-      "gates": {
-        "lesson": "שיעור",
-        "exercise": "תרגיל",
-        "ai_quota": "מכסת AI"
+      "tooltips": {
+        "activeFirstWeek": "פתחו שיעור כלשהו או ענו על שאלה ב-7 הימים הראשונים.",
+        "engagedFirstWeek": "60 שניות ומעלה בשיעור, או מענה על שאלה, ב-7 הימים הראשונים.",
+        "returnedFirstWeek": "עשו משהו שוב ביום מאוחר יותר בשבוע הראשון (24 שעות ומעלה אחרי ההרשמה).",
+        "planSelected": "לחצו על תוכנית בחסימת שדרוג, או על הרשמה בעמוד התוכניות.",
+        "afterIt": "נזקף לחסימה האחרונה שהתלמיד נתקל בה לפני שבחר תוכנית / שילם. כל תלמיד נספר תחת חסימה אחת."
+      },
+      "sideStats": {
+        "paywallDismissed": "המשיכו בלי עזרה",
+        "pricingViewed": "פתחו את עמוד התוכניות"
+      },
+      "sources": {
+        "google": "Google",
+        "guykoren": "גיא קורן",
+        "direct": "ישיר",
+        "other": "אחר",
+        "unknown": "לא ידוע"
       },
       "landingTypes": {
         "lesson": "שיעור",
@@ -206,12 +222,28 @@
         "other": "אחר",
         "unknown": "לא ידוע"
       },
-      "aliveTooltip": "פתחו שיעור כלשהו או ענו על שאלה ב-7 הימים הראשונים.",
-      "engagedTooltip": "60 שניות ומעלה בשיעור או מענה על שאלה.",
-      "activeDaysTitle": "ימי פעילות בשבוע הראשון",
-      "avgDays": "ממוצע {n} ימים",
-      "daysAxis": "x = ימי פעילות, y = תלמידים",
-      "weekCompletedCaption": "תלמידים שהשבוע הראשון שלהם הסתיים ({n})"
+      "gates": {
+        "ai_quota": "מכסת AI (מגבלה יומית)",
+        "lesson": "שיעור נעול (תרגול/מבחן)",
+        "exercise": "נעילת תרגיל (תרגיל 4 ומעלה)"
+      },
+      "wallSegments": {
+        "paid": "שילמו אחריה",
+        "planNoPay": "בחרו תוכנית, לא שילמו",
+        "noPlan": "לא בחרו תוכנית",
+        "ofWall": "מתלמידי החסימה הזו"
+      },
+      "wallColumns": {
+        "gate": "חסימה",
+        "students": "תלמידים שנתקלו",
+        "hits": "סך היתקלויות",
+        "hitsPerStudent": "היתקלויות לתלמיד",
+        "repeat": "נתקלו 2+ פעמים",
+        "dismissed": "המשיכו בלי עזרה",
+        "decidedPlan": "בחרו תוכנית אחריה",
+        "decidedPaid": "שילמו אחריה",
+        "paidPerHit": "שילמו / נתקלו"
+      }
     },
     "b2b": {
       "section": "בתי ספר",

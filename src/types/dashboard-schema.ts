@@ -168,6 +168,19 @@ const signupFunnelSchema = z
   })
   .prefault({})
 
+// Per-wall row (Web PR #1641). `decided*` are credited to the last wall the
+// student hit before picking a plan / paying, so each student counts once.
+const wallGateSchema = z
+  .object({
+    students: count,
+    hits: count,
+    repeatStudents: count,
+    dismissedStudents: count,
+    decidedPlan: count,
+    decidedPaid: count,
+  })
+  .prefault({})
+
 export const funnelSchema = z
   .object({
     eventsTrackedSince: z.string().nullable().default(null),
@@ -210,10 +223,19 @@ export const funnelSchema = z
     payments: z
       .object({
         paywallShown: count,
-        paywallByGate: z.object({ lesson: count, exercise: count, ai_quota: count }).prefault({}),
-        pricingViewed: count,
+        planSelected: count,
         checkoutStarted: count,
         paid: count,
+        paywallDismissed: count,
+        pricingViewed: count,
+        paywallByGate: z.object({ lesson: count, exercise: count, ai_quota: count }).prefault({}),
+        byGate: z
+          .object({
+            lesson: wallGateSchema,
+            exercise: wallGateSchema,
+            ai_quota: wallGateSchema,
+          })
+          .prefault({}),
       })
       .prefault({}),
   })

@@ -435,12 +435,37 @@ export interface SignupFunnel {
 export type FunnelSourceKey = keyof SignupSourceBreakdown
 export type FunnelLandingKey = LandingType | 'unknown'
 
+export type WallGate = 'lesson' | 'exercise' | 'ai_quota'
+
+/**
+ * One upgrade wall (Web PR #1641). `decidedPlan` / `decidedPaid` are credited
+ * to the last wall the student hit before picking a plan / paying, so each
+ * student counts under one wall. `dismissedStudents` only applies to
+ * ai_quota — lesson and exercise walls have no skip option.
+ */
+export interface WallGateStats {
+  students: number
+  hits: number
+  repeatStudents: number
+  dismissedStudents: number
+  decidedPlan: number
+  decidedPaid: number
+}
+
+/**
+ * Payment side covers every student active in the period, not only new
+ * signups — walls start at the 4th lesson. `paywallByGate` is the older
+ * per-gate count, kept for parsing but superseded by `byGate`.
+ */
 export interface PaymentFunnel {
   paywallShown: number
-  paywallByGate: { lesson: number; exercise: number; ai_quota: number }
-  pricingViewed: number
+  planSelected: number
   checkoutStarted: number
   paid: number
+  paywallDismissed: number
+  pricingViewed: number
+  paywallByGate: Record<WallGate, number>
+  byGate: Record<WallGate, WallGateStats>
 }
 
 export interface FunnelMetrics {
