@@ -9,6 +9,11 @@
  * anchor is announced via `aria-describedby` when the tooltip is open so
  * assistive tech gets the same content that sighted users hover for.
  *
+ * The bubble is portalled to `document.body` with fixed positioning, so an
+ * ancestor with `overflow: hidden` / `auto` (a `truncate` label, a
+ * horizontally scrolling table) can't clip it into invisibility. It closes
+ * on scroll rather than tracking the anchor.
+ *
  * @fileType component
  * @domain dashboard
  * @pattern presentational
@@ -17,7 +22,8 @@
 
 'use client'
 
-import { useId, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 import { cn } from '@/utils/ui'
 
@@ -27,34 +33,60 @@ interface FormulaTooltipProps {
   className?: string
 }
 
+// Matches `max-w-xs` (20rem) plus a small viewport margin.
+const BUBBLE_MAX_WIDTH = 320
+const VIEWPORT_MARGIN = 8
+
 export function FormulaTooltip({ children, content, className }: FormulaTooltipProps) {
-  const [open, setOpen] = useState(false)
+  const [position, setPosition] = useState<{ top: number; left: number } | null>(null)
+  const anchorRef = useRef<HTMLSpanElement>(null)
   const id = useId()
+
+  const open = () => {
+    const rect = anchorRef.current?.getBoundingClientRect()
+    if (!rect) return
+    const maxLeft = window.innerWidth - BUBBLE_MAX_WIDTH - VIEWPORT_MARGIN
+    setPosition({
+      top: rect.bottom + 4,
+      left: Math.max(VIEWPORT_MARGIN, Math.min(rect.left, maxLeft)),
+    })
+  }
+  const close = () => setPosition(null)
+
+  useEffect(() => {
+    if (!position) return
+    window.addEventListener('scroll', close, true)
+    return () => window.removeEventListener('scroll', close, true)
+  }, [position])
 
   return (
     <span
-      className={cn('relative inline-block', className)}
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
-      onFocus={() => setOpen(true)}
-      onBlur={() => setOpen(false)}
+      className={cn('inline-block', className)}
+      onMouseEnter={open}
+      onMouseLeave={close}
+      onFocus={open}
+      onBlur={close}
     >
       <span
+        ref={anchorRef}
         tabIndex={0}
-        aria-describedby={open ? id : undefined}
+        aria-describedby={position ? id : undefined}
         className="cursor-help underline decoration-dotted decoration-muted-foreground/60 underline-offset-2"
       >
         {children}
       </span>
-      {open && (
-        <span
-          id={id}
-          role="tooltip"
-          className="absolute left-0 top-full z-20 mt-1 w-max max-w-xs whitespace-pre-line rounded-md bg-foreground px-3 py-2 text-body-xs font-normal normal-case tracking-normal text-background shadow-lg"
-        >
-          {content}
-        </span>
-      )}
+      {position &&
+        createPortal(
+          <span
+            id={id}
+            role="tooltip"
+            style={{ top: position.top, left: position.left }}
+            className="fixed z-50 w-max max-w-xs whitespace-pre-line rounded-md bg-foreground px-3 py-2 text-body-xs font-normal normal-case tracking-normal text-start text-background shadow-lg"
+          >
+            {content}
+          </span>,
+          document.body,
+        )}
     </span>
   )
 }
