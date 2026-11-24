@@ -2,6 +2,20 @@
 
 All notable changes to A-Guy-Dash are documented here. Follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## v0.10.0 — 2026-11-24
+
+New Funnel tab, backed by Web #1631, #1639 and #1641. Follows visitors from landing through the signup prompt and Google sign-in to signup, then signups through first-week activity (Alive / Did something / Came back, plus a days-active histogram), the paywall, plan pick, checkout and payment. Breakdowns by landing type and traffic source, and a per-wall table (lesson / exercise / AI quota) showing hits, repeat and dismissed students, and which wall each plan pick or payment followed. Every field in the new `funnel` block defaults to zero, so against a Web build without these PRs the tab renders empty instead of failing the dashboard.
+
+### Features
+
+- Funnel tab for visitor → signup → paid (#54).
+- Funnel: first-week depth — Alive / Did something / Came back (#55).
+- Funnel: walls, picked-a-plan, and per-wall conversion (#57).
+
+### Bug Fixes
+
+- Formula tooltips render in a portal so scrolling containers can't clip them (#56).
+
 ## v0.9.0 — 2026-11-18
 
 Page-wide segment switch, backed by Web #1621. The segment picker now scopes the whole dashboard and adds a fourth bucket, `other` (school/institutional email domains and Google Classroom or `/join` arrivals that aren't on a class roster), so b2c + b2b + other = all. `segment` still defaults to `all`, so the dashboard parses against a Web build that predates #1621.
