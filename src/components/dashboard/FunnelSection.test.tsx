@@ -25,6 +25,11 @@ const funnelInput = {
     googleFailed: 1,
   },
   visitorsByLandingType: { lesson: { visitors: 50, humans: 45, signedUp: 10 } },
+  visitorsByDevice: {
+    in_app: { visitors: 30, humans: 25, googleClicked: 10, signedUp: 2, googleCancelled: 3 },
+    ios: { visitors: 40, humans: 35, googleClicked: 12, signedUp: 9 },
+    unknown: { visitors: 50, humans: 40 },
+  },
   signups: {
     signedUp: 20,
     activeFirstWeek: 15,
@@ -124,5 +129,33 @@ describe('FunnelSection', () => {
     const html = render('en', 'day', { googleOutcomesSince: null })
     expect(html).toContain('Cancel / fail not tracked yet')
     expect(html).not.toContain('Cancelled on Google')
+  })
+
+  describe('by device', () => {
+    // Only the device card, so other cards can't satisfy a match.
+    const deviceCard = (html: string) =>
+      html.slice(html.indexOf('By device'), html.indexOf('New signups → first week'))
+
+    it('orders rows by real visitors with unknown last and hides empty ones', () => {
+      const html = deviceCard(render('en', 'day'))
+      expect(html.indexOf('iPhone')).toBeLessThan(html.indexOf('In-app browser'))
+      expect(html.indexOf('In-app browser')).toBeLessThan(html.indexOf('Unknown (before tracking)'))
+      expect(html).not.toContain('Android')
+      expect(html).toContain('Device is recorded from the first page load')
+    })
+
+    it('shows clicked → signed up, with — when nobody clicked', () => {
+      const html = deviceCard(render('en', 'day'))
+      expect(html).toContain('75.0%')
+      expect(html).toContain('20.0%')
+      expect(html).toContain('—')
+    })
+
+    it('shows the outcome columns only when tracking covers the period', () => {
+      expect(deviceCard(render('en', 'day'))).toContain('Sign-in failed')
+      const before = deviceCard(render('en', 'month'))
+      expect(before).not.toContain('Sign-in failed')
+      expect(before).toContain('Cancel / fail tracking started')
+    })
   })
 })

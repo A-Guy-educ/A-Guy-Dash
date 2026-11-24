@@ -199,6 +199,16 @@ export const funnelSchema = z
         other: visitorFunnelSchema,
       })
       .prefault({}),
+    // Web PR #1661.
+    visitorsByDevice: z
+      .object({
+        in_app: visitorFunnelSchema,
+        ios: visitorFunnelSchema,
+        android: visitorFunnelSchema,
+        computer: visitorFunnelSchema,
+        unknown: visitorFunnelSchema,
+      })
+      .prefault({}),
     signups: signupFunnelSchema,
     // Index = days active (0–7). Normalised to exactly 8 buckets so the chart
     // never renders a ragged axis if Web sends a short or long array.

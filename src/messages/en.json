@@ -164,6 +164,9 @@
       "emptyState": "No funnel data yet.",
       "visitorsTitle": "Visitors → signup",
       "visitorsByLandingTitle": "Visitors by landing page",
+      "visitorsByDeviceTitle": "By device",
+      "clickedToSignedUp": "Clicked → signed up",
+      "deviceNote": "Device is recorded from the first page load of each visit. iPhone WhatsApp/Telegram links look like Safari and count as iPhone.",
       "signupsTitle": "New signups → first week",
       "activeDaysTitle": "Days active in first week",
       "bySourceTitle": "By source",
@@ -230,6 +233,13 @@
         "home": "Home",
         "other": "Other",
         "unknown": "Unknown"
+      },
+      "devices": {
+        "in_app": "In-app browser (Instagram, TikTok…)",
+        "ios": "iPhone",
+        "android": "Android",
+        "computer": "Computer",
+        "unknown": "Unknown (before tracking)"
       },
       "gates": {
         "ai_quota": "AI quota (daily limit)",

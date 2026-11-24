@@ -442,6 +442,14 @@ export interface SignupFunnel {
 export type FunnelSourceKey = keyof SignupSourceBreakdown
 export type FunnelLandingKey = LandingType | 'unknown'
 
+/**
+ * Device of a visit (Web PR #1661), from the first page load's user agent.
+ * `in_app` (Instagram/Facebook/TikTok/Snapchat or another app's built-in
+ * browser) wins over the platform. `unknown` = visits from before devices
+ * were recorded, plus any platform Web doesn't classify.
+ */
+export type FunnelDeviceKey = 'in_app' | 'ios' | 'android' | 'computer' | 'unknown'
+
 export type WallGate = 'lesson' | 'exercise' | 'ai_quota'
 
 /**
@@ -481,6 +489,7 @@ export interface FunnelMetrics {
   googleOutcomesSince: string | null
   visitors: VisitorFunnel
   visitorsByLandingType: Record<LandingType, VisitorFunnel>
+  visitorsByDevice: Record<FunnelDeviceKey, VisitorFunnel>
   signups: SignupFunnel
   firstWeekActiveDays: number[]
   bySource: Record<FunnelSourceKey, SignupFunnel>
