@@ -39,7 +39,11 @@ describe('funnel', () => {
     delete older.funnel
     const { funnel } = dashboardMetricsSchema.parse(older)
     expect(funnel.eventsTrackedSince).toBeNull()
+    expect(funnel.googleOutcomesSince).toBeNull()
+    expect(funnel.existingStudentVisits).toBe(0)
     expect(funnel.visitors.humans).toBe(0)
+    expect(funnel.visitors).toMatchObject({ googleCancelled: 0, googleFailed: 0 })
+    expect(funnel.visitorsByLandingType.lesson.googleFailed).toBe(0)
     expect(funnel.bySource.google.paid).toBe(0)
     expect(funnel.byLandingType.unknown.signedUp).toBe(0)
     expect(funnel.payments.paywallByGate.ai_quota).toBe(0)

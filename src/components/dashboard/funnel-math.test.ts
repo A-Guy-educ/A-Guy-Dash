@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   formatRatio,
   gatesByStudents,
+  googleDropOff,
   periodStartYmd,
   startsBeforeTracking,
   wallSegments,
@@ -58,6 +59,31 @@ describe('wallSegments', () => {
 
   it('never goes negative when paid exceeds picked-plan', () => {
     expect(wallSegments(gate(5, 1, 2))).toEqual({ paid: 2, planNoPay: 0, noPlan: 3 })
+  })
+})
+
+describe('googleDropOff', () => {
+  const visitors = (
+    googleClicked: number,
+    signedUp: number,
+    cancelled: number,
+    failed: number,
+  ) => ({
+    visitors: 0,
+    humans: 0,
+    signupPromptShown: 0,
+    googleClicked,
+    signedUp,
+    googleCancelled: cancelled,
+    googleFailed: failed,
+  })
+
+  it('treats the remainder after cancels and failures as no return', () => {
+    expect(googleDropOff(visitors(30, 20, 4, 1))).toEqual({ cancelled: 4, failed: 1, noReturn: 5 })
+  })
+
+  it('floors no return at 0', () => {
+    expect(googleDropOff(visitors(10, 9, 2, 1)).noReturn).toBe(0)
   })
 })
 

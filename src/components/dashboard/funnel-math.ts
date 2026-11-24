@@ -1,4 +1,4 @@
-import type { Period, WallGate, WallGateStats } from '@/types/dashboard'
+import type { Period, VisitorFunnel, WallGate, WallGateStats } from '@/types/dashboard'
 
 function ymd(date: Date): string {
   const y = date.getFullYear()
@@ -29,6 +29,22 @@ export function startsBeforeTracking(
 ): boolean {
   if (!eventsTrackedSince) return false
   return periodStartYmd(period, now) < eventsTrackedSince
+}
+
+/**
+ * Why Google clicks didn't become signups (Web PR #1660). `noReturn` is the
+ * remainder after cancels and failures (closed the window, or an in-app
+ * browser blocked Google), floored at 0 so a cohort edge can't go negative.
+ */
+export function googleDropOff(visitors: VisitorFunnel) {
+  return {
+    cancelled: visitors.googleCancelled,
+    failed: visitors.googleFailed,
+    noReturn: Math.max(
+      visitors.googleClicked - visitors.signedUp - visitors.googleCancelled - visitors.googleFailed,
+      0,
+    ),
+  }
 }
 
 export const WALL_GATES: readonly WallGate[] = ['ai_quota', 'lesson', 'exercise']
