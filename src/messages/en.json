@@ -173,6 +173,7 @@
       "wallsChartTitle": "What happened after each wall",
       "wallsTableTitle": "Walls",
       "likelyBots": "incl. {n} likely bots",
+      "existingStudentsNote": "{n} visits were existing students logging back in and are not counted",
       "ofHumans": "of real visitors",
       "ofSignedUp": "of signups",
       "ofPaywall": "of students who hit a wall",
@@ -201,7 +202,15 @@
         "engagedFirstWeek": "60s+ in a lesson, or answered a question, in the first 7 days.",
         "returnedFirstWeek": "Did something again on a later day in the first week (24h+ after signup).",
         "planSelected": "Clicked a plan on an upgrade wall, or Subscribe on the plans page.",
-        "afterIt": "Credited to the last wall the student hit before picking a plan / paying. Each student counts under one wall."
+        "afterIt": "Credited to the last wall the student hit before picking a plan / paying. Each student counts under one wall.",
+        "noReturn": "Closed the Google window, or Google blocked sign-in (e.g. inside Instagram/TikTok/WhatsApp browsers)."
+      },
+      "googleOutcomes": {
+        "cancelled": "Cancelled on Google",
+        "failed": "Sign-in failed",
+        "noReturn": "Didn't come back from Google",
+        "trackingStarted": "Cancel / fail tracking started {date}",
+        "notTracked": "Cancel / fail not tracked yet"
       },
       "sideStats": {
         "paywallDismissed": "Continued without help",

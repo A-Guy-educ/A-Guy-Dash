@@ -1,9 +1,10 @@
 /**
- * Funnel tab (Web PRs #1631, #1639, #1641). Read-only render of
+ * Funnel tab (Web PRs #1631, #1639, #1641, #1660). Read-only render of
  * `data.funnel`; follows the shell's period + segment.
  *
  * Sections, top to bottom:
- * 1. Visitors → signup bars + visitors-by-landing table
+ * 1. Visitors → signup bars (with why Google clicks didn't sign up under
+ *    "Clicked Google") + visitors-by-landing table
  * 2. New signups → first week bars (Alive / Did something / Came back) +
  *    days-active histogram over signups whose first week is over
  * 3. Signups by source / by landing page tables
@@ -12,9 +13,10 @@
  * 5. Walls: stacked outcome bar per gate + per-gate table
  *
  * Caveats rendered inline: wall / plan / checkout events only exist from
- * `eventsTrackedSince` (note on sections 4–5 and the Paid column); visitor
- * steps are anonymous and can't be segmented (note on section 1 under
- * b2b / other).
+ * `eventsTrackedSince` (note on sections 4–5 and the Paid column); Google
+ * cancel / fail outcomes only exist from `googleOutcomesSince` (breakdown
+ * replaced by a note when the period starts earlier); visitor steps are
+ * anonymous and can't be segmented (note on section 1 under b2b / other).
  *
  * @fileType component
  * @domain dashboard
@@ -38,7 +40,13 @@ import type {
   WallGate,
   WallGateStats,
 } from '@/types/dashboard'
-import { formatRatio, gatesByStudents, startsBeforeTracking, wallSegments } from './funnel-math'
+import {
+  formatRatio,
+  gatesByStudents,
+  googleDropOff,
+  startsBeforeTracking,
+  wallSegments,
+} from './funnel-math'
 import { formatPercent, percentOf } from './guest-insights-math'
 import { FormulaTooltip } from './product-health/FormulaTooltip'
 
@@ -94,6 +102,8 @@ const WALL_SEGMENTS = [
 // Only the AI-quota wall has a "continue without upgrading" option.
 const DISMISSABLE_GATES = new Set<WallGate>(['ai_quota'])
 
+const GOOGLE_DROP_OFF_KEYS = ['cancelled', 'failed', 'noReturn'] as const
+
 interface Props {
   funnel: FunnelMetrics
   period: Period
@@ -103,16 +113,28 @@ interface Props {
 export function FunnelSection({ funnel, period, segment }: Props) {
   const t = useTranslations('dashboard.funnel')
   const locale = useLocale()
+  const formatYmd = (ymd: string) => new Date(`${ymd}T00:00:00`).toLocaleDateString(locale)
 
   const trackingNote =
     startsBeforeTracking(period, funnel.eventsTrackedSince) && funnel.eventsTrackedSince
-      ? t('trackingNote').replace(
-          '{date}',
-          new Date(`${funnel.eventsTrackedSince}T00:00:00`).toLocaleDateString(locale),
-        )
+      ? t('trackingNote').replace('{date}', formatYmd(funnel.eventsTrackedSince))
       : null
   const likelyBots = Math.max(0, funnel.visitors.visitors - funnel.visitors.humans)
   const showAnonymousNote = segment === 'b2b' || segment === 'other'
+
+  // Cancel / fail outcomes only exist from googleOutcomesSince, so the
+  // breakdown is shown only when the whole period is covered.
+  const { googleOutcomesSince } = funnel
+  const googleDetail =
+    googleOutcomesSince === null ? (
+      <Note>{t('googleOutcomes.notTracked')}</Note>
+    ) : startsBeforeTracking(period, googleOutcomesSince) ? (
+      <Note>
+        {t('googleOutcomes.trackingStarted').replace('{date}', formatYmd(googleOutcomesSince))}
+      </Note>
+    ) : (
+      <GoogleDropOffList visitors={funnel.visitors} />
+    )
 
   const stepLabel = (step: string) =>
     STEPS_WITH_TOOLTIP.has(step) ? (
@@ -133,6 +155,7 @@ export function FunnelSection({ funnel, period, segment }: Props) {
             key: step,
             label: stepLabel(step),
             value: funnel.visitors[step],
+            detail: step === 'googleClicked' ? googleDetail : undefined,
           }))}
           base={funnel.visitors.humans}
           baseLabel={t('ofHumans')}
@@ -140,6 +163,14 @@ export function FunnelSection({ funnel, period, segment }: Props) {
           footer={
             <>
               <Note>{t('likelyBots').replace('{n}', likelyBots.toLocaleString(locale))}</Note>
+              {funnel.existingStudentVisits > 0 && (
+                <Note>
+                  {t('existingStudentsNote').replace(
+                    '{n}',
+                    funnel.existingStudentVisits.toLocaleString(locale),
+                  )}
+                </Note>
+              )}
               {showAnonymousNote && <Note>{t('anonymousNote')}</Note>}
             </>
           }
@@ -236,6 +267,8 @@ interface FunnelStep {
   key: string
   label: React.ReactNode
   value: number
+  /** Rendered under the step's bar. */
+  detail?: React.ReactNode
 }
 
 function FunnelCard({
@@ -287,6 +320,9 @@ function FunnelCard({
                         aria-hidden
                       />
                     </div>
+                    {step.detail && (
+                      <div className="mt-1 border-s border-border ps-3">{step.detail}</div>
+                    )}
                   </li>
                 )
               })}
@@ -297,6 +333,32 @@ function FunnelCard({
         {footer}
       </CardContent>
     </Card>
+  )
+}
+
+/** Why Google clicks didn't sign up, nested under the "Clicked Google" bar. */
+function GoogleDropOffList({ visitors }: { visitors: VisitorFunnel }) {
+  const t = useTranslations('dashboard.funnel')
+  const locale = useLocale()
+  const parts = googleDropOff(visitors)
+
+  return (
+    <ul className="space-y-0.5 text-body-xs text-muted-foreground">
+      {GOOGLE_DROP_OFF_KEYS.map((key) => (
+        <li key={key} className="flex items-center justify-between gap-content-gap-xs">
+          <span className="truncate">
+            {key === 'noReturn' ? (
+              <FormulaTooltip content={t('tooltips.noReturn')}>
+                {t('googleOutcomes.noReturn')}
+              </FormulaTooltip>
+            ) : (
+              t(`googleOutcomes.${key}`)
+            )}
+          </span>
+          <span className="tabular-nums shrink-0">{parts[key].toLocaleString(locale)}</span>
+        </li>
+      ))}
+    </ul>
   )
 }
 
