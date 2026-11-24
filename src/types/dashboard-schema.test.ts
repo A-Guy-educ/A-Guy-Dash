@@ -33,6 +33,68 @@ const EMPTY_GUEST_INSIGHTS = {
   },
 }
 
+describe('funnel', () => {
+  it('defaults to all zeros when an older Web omits it', () => {
+    const older: Partial<ReturnType<typeof dashboardFixture>> = dashboardFixture()
+    delete older.funnel
+    const { funnel } = dashboardMetricsSchema.parse(older)
+    expect(funnel.eventsTrackedSince).toBeNull()
+    expect(funnel.visitors.humans).toBe(0)
+    expect(funnel.bySource.google.paid).toBe(0)
+    expect(funnel.byLandingType.unknown.signedUp).toBe(0)
+    expect(funnel.payments.paywallByGate.ai_quota).toBe(0)
+    expect(funnel.firstWeekActiveDays).toEqual([0, 0, 0, 0, 0, 0, 0, 0])
+    expect(funnel.signups).toMatchObject({
+      engagedFirstWeek: 0,
+      weekCompleted: 0,
+      activeDaysFirstWeek: 0,
+    })
+  })
+
+  it('defaults payment fields and every wall row to zeros', () => {
+    const { funnel } = dashboardMetricsSchema.parse({
+      ...dashboardFixture(),
+      funnel: { payments: { planSelected: 4, byGate: { ai_quota: { students: 9, hits: 20 } } } },
+    })
+    expect(funnel.payments).toMatchObject({ planSelected: 4, paywallDismissed: 0, paid: 0 })
+    expect(funnel.payments.byGate.ai_quota).toEqual({
+      students: 9,
+      hits: 20,
+      repeatStudents: 0,
+      dismissedStudents: 0,
+      decidedPlan: 0,
+      decidedPaid: 0,
+    })
+    expect(funnel.payments.byGate.lesson.students).toBe(0)
+    expect(funnel.payments.byGate.exercise.decidedPaid).toBe(0)
+  })
+
+  it('normalises firstWeekActiveDays to exactly 8 buckets', () => {
+    const parse = (firstWeekActiveDays: number[]) =>
+      dashboardMetricsSchema.parse({ ...dashboardFixture(), funnel: { firstWeekActiveDays } })
+        .funnel.firstWeekActiveDays
+    expect(parse([5, 4, 3])).toEqual([5, 4, 3, 0, 0, 0, 0, 0])
+    expect(parse([1, 1, 1, 1, 1, 1, 1, 1, 9])).toEqual([1, 1, 1, 1, 1, 1, 1, 1])
+  })
+
+  it('fills missing keys inside a partial funnel', () => {
+    const { funnel } = dashboardMetricsSchema.parse({
+      ...dashboardFixture(),
+      funnel: {
+        eventsTrackedSince: '2026-11-18',
+        signups: { signedUp: 10, paid: 1 },
+        bySource: { google: { signedUp: 4 } },
+        payments: { paywallByGate: { lesson: 3 } },
+      },
+    })
+    expect(funnel.eventsTrackedSince).toBe('2026-11-18')
+    expect(funnel.signups).toMatchObject({ signedUp: 10, paid: 1, activeFirstWeek: 0 })
+    expect(funnel.bySource.google).toMatchObject({ signedUp: 4, paid: 0 })
+    expect(funnel.bySource.direct.signedUp).toBe(0)
+    expect(funnel.payments.paywallByGate).toEqual({ lesson: 3, exercise: 0, ai_quota: 0 })
+  })
+})
+
 describe('segment', () => {
   it("defaults to 'all' when an older Web omits it", () => {
     const older: Partial<ReturnType<typeof dashboardFixture>> = dashboardFixture()

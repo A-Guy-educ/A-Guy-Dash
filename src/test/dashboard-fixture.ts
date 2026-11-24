@@ -1,4 +1,4 @@
-import type { DashboardMetricsResponse } from '@/types/dashboard'
+import { funnelSchema, type DashboardMetricsResponse } from '@/types/dashboard'
 
 export function dashboardFixture(): DashboardMetricsResponse {
   return {
@@ -111,5 +111,6 @@ export function dashboardFixture(): DashboardMetricsResponse {
         unconfirmedLast30d: 6,
       },
     },
+    funnel: funnelSchema.parse({}),
   }
 }

@@ -397,6 +397,88 @@ export interface B2BMetrics {
   perSchool: B2BSchoolRow[]
 }
 
+/**
+ * Visitor → signup → first week → payment funnel (Web PR #1631). Follows
+ * `period` and `segment` like the other blocks. Every value is a count of
+ * distinct sessions (visitor steps) or students (signup / payment steps).
+ *
+ * Paywall / pricing / checkout events only exist from `eventsTrackedSince`
+ * (YYYY-MM-DD); windows starting earlier undercount them. "Returned" = active
+ * = did something (engaged) again on a later day in the first week, so very
+ * recent signups haven't had their full week yet. First-week depth (Web PR
+ * #1639): `weekCompleted` = signups whose first week is over;
+ * `activeDaysFirstWeek` sums their active days; `firstWeekActiveDays[d]` =
+ * how many of them were active on exactly d days (0–7). Visitor steps are anonymous sessions and can't be
+ * segmented. Schema defaults every count to 0 for a Web deploy without it.
+ */
+export interface VisitorFunnel {
+  visitors: number
+  humans: number
+  signupPromptShown: number
+  googleClicked: number
+  signedUp: number
+}
+
+export interface SignupFunnel {
+  signedUp: number
+  activeFirstWeek: number
+  engagedFirstWeek: number
+  returnedFirstWeek: number
+  weekCompleted: number
+  activeDaysFirstWeek: number
+  paywallShown: number
+  pricingViewed: number
+  checkoutStarted: number
+  paid: number
+}
+
+export type FunnelSourceKey = keyof SignupSourceBreakdown
+export type FunnelLandingKey = LandingType | 'unknown'
+
+export type WallGate = 'lesson' | 'exercise' | 'ai_quota'
+
+/**
+ * One upgrade wall (Web PR #1641). `decidedPlan` / `decidedPaid` are credited
+ * to the last wall the student hit before picking a plan / paying, so each
+ * student counts under one wall. `dismissedStudents` only applies to
+ * ai_quota — lesson and exercise walls have no skip option.
+ */
+export interface WallGateStats {
+  students: number
+  hits: number
+  repeatStudents: number
+  dismissedStudents: number
+  decidedPlan: number
+  decidedPaid: number
+}
+
+/**
+ * Payment side covers every student active in the period, not only new
+ * signups — walls start at the 4th lesson. `paywallByGate` is the older
+ * per-gate count, kept for parsing but superseded by `byGate`.
+ */
+export interface PaymentFunnel {
+  paywallShown: number
+  planSelected: number
+  checkoutStarted: number
+  paid: number
+  paywallDismissed: number
+  pricingViewed: number
+  paywallByGate: Record<WallGate, number>
+  byGate: Record<WallGate, WallGateStats>
+}
+
+export interface FunnelMetrics {
+  eventsTrackedSince: string | null
+  visitors: VisitorFunnel
+  visitorsByLandingType: Record<LandingType, VisitorFunnel>
+  signups: SignupFunnel
+  firstWeekActiveDays: number[]
+  bySource: Record<FunnelSourceKey, SignupFunnel>
+  byLandingType: Record<FunnelLandingKey, SignupFunnel>
+  payments: PaymentFunnel
+}
+
 export interface DashboardMetricsResponse {
   period: Period
   segment: Segment
@@ -409,11 +491,13 @@ export interface DashboardMetricsResponse {
   productHealth?: ProductHealth
   guestInsights: GuestInsights
   b2bMetrics?: B2BMetrics
+  funnel: FunnelMetrics
 }
 
 export {
   b2bMetricsSchema,
   dashboardMetricsSchema,
+  funnelSchema,
   guestInsightsSchema,
   LANDING_TYPES,
   productHealthSchema,

@@ -141,6 +141,106 @@ const revenueSegmentsSchema = z.object({
     .prefault({}),
 })
 
+// Funnel (Web PR #1631). Same degrade-to-zeros approach as guestInsights so
+// a Web deploy without the block renders an empty tab instead of 502-ing.
+const visitorFunnelSchema = z
+  .object({
+    visitors: count,
+    humans: count,
+    signupPromptShown: count,
+    googleClicked: count,
+    signedUp: count,
+  })
+  .prefault({})
+
+const signupFunnelSchema = z
+  .object({
+    signedUp: count,
+    activeFirstWeek: count,
+    engagedFirstWeek: count,
+    returnedFirstWeek: count,
+    weekCompleted: count,
+    activeDaysFirstWeek: count,
+    paywallShown: count,
+    pricingViewed: count,
+    checkoutStarted: count,
+    paid: count,
+  })
+  .prefault({})
+
+// Per-wall row (Web PR #1641). `decided*` are credited to the last wall the
+// student hit before picking a plan / paying, so each student counts once.
+const wallGateSchema = z
+  .object({
+    students: count,
+    hits: count,
+    repeatStudents: count,
+    dismissedStudents: count,
+    decidedPlan: count,
+    decidedPaid: count,
+  })
+  .prefault({})
+
+export const funnelSchema = z
+  .object({
+    eventsTrackedSince: z.string().nullable().default(null),
+    visitors: visitorFunnelSchema,
+    visitorsByLandingType: z
+      .object({
+        lesson: visitorFunnelSchema,
+        course: visitorFunnelSchema,
+        start: visitorFunnelSchema,
+        home: visitorFunnelSchema,
+        other: visitorFunnelSchema,
+      })
+      .prefault({}),
+    signups: signupFunnelSchema,
+    // Index = days active (0–7). Normalised to exactly 8 buckets so the chart
+    // never renders a ragged axis if Web sends a short or long array.
+    firstWeekActiveDays: z
+      .array(z.number())
+      .default([])
+      .transform((days) => Array.from({ length: 8 }, (_, i) => days[i] ?? 0)),
+    bySource: z
+      .object({
+        google: signupFunnelSchema,
+        guykoren: signupFunnelSchema,
+        direct: signupFunnelSchema,
+        other: signupFunnelSchema,
+        unknown: signupFunnelSchema,
+      })
+      .prefault({}),
+    byLandingType: z
+      .object({
+        lesson: signupFunnelSchema,
+        course: signupFunnelSchema,
+        start: signupFunnelSchema,
+        home: signupFunnelSchema,
+        other: signupFunnelSchema,
+        unknown: signupFunnelSchema,
+      })
+      .prefault({}),
+    payments: z
+      .object({
+        paywallShown: count,
+        planSelected: count,
+        checkoutStarted: count,
+        paid: count,
+        paywallDismissed: count,
+        pricingViewed: count,
+        paywallByGate: z.object({ lesson: count, exercise: count, ai_quota: count }).prefault({}),
+        byGate: z
+          .object({
+            lesson: wallGateSchema,
+            exercise: wallGateSchema,
+            ai_quota: wallGateSchema,
+          })
+          .prefault({}),
+      })
+      .prefault({}),
+  })
+  .prefault({})
+
 // School adoption block (Web PR #1540) — only present for segment=b2b.
 export const b2bMetricsSchema = z.object({
   schools: z.number(),
@@ -266,6 +366,7 @@ export const dashboardMetricsSchema = z.object({
   productHealth: productHealthSchema.optional(),
   guestInsights: guestInsightsSchema,
   b2bMetrics: b2bMetricsSchema.optional(),
+  funnel: funnelSchema,
   tokenMetrics: z.object({
     totalTokensToday: z.number(),
     totalTokensThisMonth: z.number(),
