@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  devicesByHumans,
   formatRatio,
   gatesByStudents,
   googleDropOff,
@@ -84,6 +85,30 @@ describe('googleDropOff', () => {
 
   it('floors no return at 0', () => {
     expect(googleDropOff(visitors(10, 9, 2, 1)).noReturn).toBe(0)
+  })
+})
+
+describe('devicesByHumans', () => {
+  const device = (visitors: number, humans: number) => ({
+    visitors,
+    humans,
+    signupPromptShown: 0,
+    googleClicked: 0,
+    signedUp: 0,
+    googleCancelled: 0,
+    googleFailed: 0,
+  })
+
+  it('orders by real visitors, keeps unknown last and drops empty rows', () => {
+    expect(
+      devicesByHumans({
+        in_app: device(30, 25),
+        ios: device(40, 35),
+        android: device(0, 0),
+        computer: device(12, 10),
+        unknown: device(90, 80),
+      }),
+    ).toEqual(['ios', 'in_app', 'computer', 'unknown'])
   })
 })
 

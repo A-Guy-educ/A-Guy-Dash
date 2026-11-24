@@ -164,6 +164,9 @@
       "emptyState": "אין עדיין נתוני משפך.",
       "visitorsTitle": "מבקרים ← הרשמה",
       "visitorsByLandingTitle": "מבקרים לפי עמוד נחיתה",
+      "visitorsByDeviceTitle": "לפי מכשיר",
+      "clickedToSignedUp": "לחצו ← נרשמו",
+      "deviceNote": "המכשיר נרשם בטעינת העמוד הראשונה של כל ביקור. קישורי WhatsApp/Telegram באייפון נראים כמו Safari ונספרים כ-iPhone.",
       "signupsTitle": "נרשמים חדשים ← שבוע ראשון",
       "activeDaysTitle": "ימי פעילות בשבוע הראשון",
       "bySourceTitle": "לפי מקור",
@@ -230,6 +233,13 @@
         "home": "בית",
         "other": "אחר",
         "unknown": "לא ידוע"
+      },
+      "devices": {
+        "in_app": "דפדפן בתוך אפליקציה (Instagram, TikTok…)",
+        "ios": "iPhone",
+        "android": "Android",
+        "computer": "מחשב",
+        "unknown": "לא ידוע (לפני המעקב)"
       },
       "gates": {
         "ai_quota": "מכסת AI (מגבלה יומית)",

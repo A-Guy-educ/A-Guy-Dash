@@ -1,4 +1,10 @@
-import type { Period, VisitorFunnel, WallGate, WallGateStats } from '@/types/dashboard'
+import type {
+  FunnelDeviceKey,
+  Period,
+  VisitorFunnel,
+  WallGate,
+  WallGateStats,
+} from '@/types/dashboard'
 
 function ymd(date: Date): string {
   const y = date.getFullYear()
@@ -45,6 +51,17 @@ export function googleDropOff(visitors: VisitorFunnel) {
       0,
     ),
   }
+}
+
+const KNOWN_DEVICES: readonly FunnelDeviceKey[] = ['in_app', 'ios', 'android', 'computer']
+
+/**
+ * Device rows with any visitors, ordered by real visitors descending (stable
+ * for ties). `unknown` is pre-tracking backlog, so it always goes last.
+ */
+export function devicesByHumans(byDevice: Record<FunnelDeviceKey, VisitorFunnel>) {
+  const known = [...KNOWN_DEVICES].sort((a, b) => byDevice[b].humans - byDevice[a].humans)
+  return [...known, 'unknown' as const].filter((key) => byDevice[key].visitors > 0)
 }
 
 export const WALL_GATES: readonly WallGate[] = ['ai_quota', 'lesson', 'exercise']

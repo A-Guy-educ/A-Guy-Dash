@@ -1,10 +1,10 @@
 /**
- * Funnel tab (Web PRs #1631, #1639, #1641, #1660). Read-only render of
+ * Funnel tab (Web PRs #1631, #1639, #1641, #1660, #1661). Read-only render of
  * `data.funnel`; follows the shell's period + segment.
  *
  * Sections, top to bottom:
  * 1. Visitors → signup bars (with why Google clicks didn't sign up under
- *    "Clicked Google") + visitors-by-landing table
+ *    "Clicked Google") + visitors-by-landing table, then visitors by device
  * 2. New signups → first week bars (Alive / Did something / Came back) +
  *    days-active histogram over signups whose first week is over
  * 3. Signups by source / by landing page tables
@@ -31,6 +31,7 @@ import type React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useLocale, useTranslations } from '@/components/i18n'
 import type {
+  FunnelDeviceKey,
   FunnelMetrics,
   LandingType,
   Period,
@@ -41,6 +42,7 @@ import type {
   WallGateStats,
 } from '@/types/dashboard'
 import {
+  devicesByHumans,
   formatRatio,
   gatesByStudents,
   googleDropOff,
@@ -123,18 +125,20 @@ export function FunnelSection({ funnel, period, segment }: Props) {
   const showAnonymousNote = segment === 'b2b' || segment === 'other'
 
   // Cancel / fail outcomes only exist from googleOutcomesSince, so the
-  // breakdown is shown only when the whole period is covered.
+  // breakdown is shown only when the whole period is covered; otherwise
+  // this note stands in for it.
   const { googleOutcomesSince } = funnel
-  const googleDetail =
-    googleOutcomesSince === null ? (
-      <Note>{t('googleOutcomes.notTracked')}</Note>
-    ) : startsBeforeTracking(period, googleOutcomesSince) ? (
-      <Note>
-        {t('googleOutcomes.trackingStarted').replace('{date}', formatYmd(googleOutcomesSince))}
-      </Note>
-    ) : (
-      <GoogleDropOffList visitors={funnel.visitors} />
-    )
+  const googleOutcomesNote =
+    googleOutcomesSince === null
+      ? t('googleOutcomes.notTracked')
+      : startsBeforeTracking(period, googleOutcomesSince)
+        ? t('googleOutcomes.trackingStarted').replace('{date}', formatYmd(googleOutcomesSince))
+        : null
+  const googleDetail = googleOutcomesNote ? (
+    <Note>{googleOutcomesNote}</Note>
+  ) : (
+    <GoogleDropOffList visitors={funnel.visitors} />
+  )
 
   const stepLabel = (step: string) =>
     STEPS_WITH_TOOLTIP.has(step) ? (
@@ -177,6 +181,11 @@ export function FunnelSection({ funnel, period, segment }: Props) {
         />
         <VisitorsByLandingTable funnel={funnel} showAnonymousNote={showAnonymousNote} />
       </div>
+      <VisitorsByDeviceTable
+        byDevice={funnel.visitorsByDevice}
+        googleOutcomesNote={googleOutcomesNote}
+        showAnonymousNote={showAnonymousNote}
+      />
 
       {/* 2. New signups → first week */}
       <div className="grid gap-content-gap grid-cols-1 lg:grid-cols-2">
@@ -417,6 +426,99 @@ function VisitorsByLandingTable({
             </table>
           </div>
         )}
+        {showAnonymousNote && <Note>{t('anonymousNote')}</Note>}
+      </CardContent>
+    </Card>
+  )
+}
+
+/**
+ * Visitor funnel per device (Web PR #1661). The cancel / fail / no-return
+ * columns are dropped when the period predates googleOutcomesSince, same as
+ * the breakdown under "Clicked Google".
+ */
+function VisitorsByDeviceTable({
+  byDevice,
+  googleOutcomesNote,
+  showAnonymousNote,
+}: {
+  byDevice: Record<FunnelDeviceKey, VisitorFunnel>
+  googleOutcomesNote: string | null
+  showAnonymousNote: boolean
+}) {
+  const t = useTranslations('dashboard.funnel')
+  const locale = useLocale()
+  const rows = devicesByHumans(byDevice)
+  const showOutcomes = googleOutcomesNote === null
+  const n = (value: number) => value.toLocaleString(locale)
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-heading-md">{t('visitorsByDeviceTitle')}</CardTitle>
+      </CardHeader>
+      <CardContent className="pt-0 space-y-3">
+        {rows.length === 0 ? (
+          <p className="text-body-sm text-muted-foreground">{t('emptyState')}</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-body-sm">
+              <thead>
+                <tr className="text-body-xs text-muted-foreground uppercase tracking-wide">
+                  <th className="text-start font-normal pb-2">{t('rowKey')}</th>
+                  {VISITOR_STEPS.map((col) => (
+                    <th key={col} className="text-end font-normal pb-2 ps-3">
+                      {t(`steps.${col}`)}
+                    </th>
+                  ))}
+                  <th className="text-end font-normal pb-2 ps-3">{t('clickedToSignedUp')}</th>
+                  {showOutcomes && (
+                    <>
+                      <th className="text-end font-normal pb-2 ps-3">
+                        {t('googleOutcomes.cancelled')}
+                      </th>
+                      <th className="text-end font-normal pb-2 ps-3">
+                        {t('googleOutcomes.failed')}
+                      </th>
+                      <th className="text-end font-normal pb-2 ps-3">
+                        <FormulaTooltip content={t('tooltips.noReturn')}>
+                          {t('googleOutcomes.noReturn')}
+                        </FormulaTooltip>
+                      </th>
+                    </>
+                  )}
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((key) => {
+                  const row = byDevice[key]
+                  const dropOff = googleDropOff(row)
+                  return (
+                    <tr key={key} className="border-t border-border">
+                      <td className="py-2">{t(`devices.${key}`)}</td>
+                      {VISITOR_STEPS.map((col) => (
+                        <td key={col} className="py-2 ps-3 text-end tabular-nums">
+                          {n(row[col])}
+                        </td>
+                      ))}
+                      <td className="py-2 ps-3 text-end tabular-nums font-semibold">
+                        {formatPercent(percentOf(row.signedUp, row.googleClicked))}
+                      </td>
+                      {showOutcomes &&
+                        GOOGLE_DROP_OFF_KEYS.map((part) => (
+                          <td key={part} className="py-2 ps-3 text-end tabular-nums">
+                            {n(dropOff[part])}
+                          </td>
+                        ))}
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+        {googleOutcomesNote && rows.length > 0 && <Note>{googleOutcomesNote}</Note>}
+        <Note>{t('deviceNote')}</Note>
         {showAnonymousNote && <Note>{t('anonymousNote')}</Note>}
       </CardContent>
     </Card>

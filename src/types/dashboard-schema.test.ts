@@ -44,6 +44,22 @@ describe('funnel', () => {
     expect(funnel.visitors.humans).toBe(0)
     expect(funnel.visitors).toMatchObject({ googleCancelled: 0, googleFailed: 0 })
     expect(funnel.visitorsByLandingType.lesson.googleFailed).toBe(0)
+    expect(Object.keys(funnel.visitorsByDevice)).toEqual([
+      'in_app',
+      'ios',
+      'android',
+      'computer',
+      'unknown',
+    ])
+    expect(funnel.visitorsByDevice.in_app).toEqual({
+      visitors: 0,
+      humans: 0,
+      signupPromptShown: 0,
+      googleClicked: 0,
+      signedUp: 0,
+      googleCancelled: 0,
+      googleFailed: 0,
+    })
     expect(funnel.bySource.google.paid).toBe(0)
     expect(funnel.byLandingType.unknown.signedUp).toBe(0)
     expect(funnel.payments.paywallByGate.ai_quota).toBe(0)
