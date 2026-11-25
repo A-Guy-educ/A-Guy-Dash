@@ -189,7 +189,7 @@
       "rowKey": "",
       "steps": {
         "humans": "Real visitors",
-        "signupPromptShown": "Saw signup prompt",
+        "signupPromptShown": "Reached sign-in",
         "googleClicked": "Clicked Google",
         "signedUp": "Signed up",
         "activeFirstWeek": "Alive",
@@ -199,6 +199,9 @@
         "planSelected": "Picked a plan",
         "checkoutStarted": "Started checkout",
         "paid": "Paid"
+      },
+      "stepHints": {
+        "signupPromptShown": "Got to the sign-in step: lesson visitors pressed Start, home visitors got through the /start wizard."
       },
       "tooltips": {
         "activeFirstWeek": "Opened any lesson or answered a question in the first 7 days.",

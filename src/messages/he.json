@@ -189,7 +189,7 @@
       "rowKey": "",
       "steps": {
         "humans": "מבקרים אמיתיים",
-        "signupPromptShown": "ראו הצעת הרשמה",
+        "signupPromptShown": "הגיעו להתחברות",
         "googleClicked": "לחצו על Google",
         "signedUp": "נרשמו",
         "activeFirstWeek": "בחיים",
@@ -199,6 +199,9 @@
         "planSelected": "בחרו תוכנית",
         "checkoutStarted": "התחילו תשלום",
         "paid": "שילמו"
+      },
+      "stepHints": {
+        "signupPromptShown": "הגיעו לשלב ההתחברות: מבקרים בשיעור לחצו על התחלה, מבקרים בדף הבית עברו את אשף ה-/start."
       },
       "tooltips": {
         "activeFirstWeek": "פתחו שיעור כלשהו או ענו על שאלה ב-7 הימים הראשונים.",

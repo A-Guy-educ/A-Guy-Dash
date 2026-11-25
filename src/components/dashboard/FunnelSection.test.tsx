@@ -85,6 +85,8 @@ describe('FunnelSection', () => {
   it('renders the sections, wall outcomes and caveats', () => {
     const html = render('en')
     expect(html).toContain('Real visitors')
+    expect(html).toContain('Reached sign-in')
+    expect(html).toContain('lesson visitors pressed Start')
     expect(html).toContain('incl. 20 likely bots')
     expect(html).toContain('Days active in first week')
     expect(html).toContain('Students whose first week is over (8)')
