@@ -159,7 +159,12 @@ export function FunnelSection({ funnel, period, segment }: Props) {
             key: step,
             label: stepLabel(step),
             value: funnel.visitors[step],
-            detail: step === 'googleClicked' ? googleDetail : undefined,
+            detail:
+              step === 'signupPromptShown' ? (
+                <Note>{t('stepHints.signupPromptShown')}</Note>
+              ) : step === 'googleClicked' ? (
+                googleDetail
+              ) : undefined,
           }))}
           base={funnel.visitors.humans}
           baseLabel={t('ofHumans')}
