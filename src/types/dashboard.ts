@@ -410,6 +410,11 @@ export interface B2BMetrics {
  * `activeDaysFirstWeek` sums their active days; `firstWeekActiveDays[d]` =
  * how many of them were active on exactly d days (0–7). Visitor steps are anonymous sessions and can't be
  * segmented. Schema defaults every count to 0 for a Web deploy without it.
+ *
+ * Existing students logging back in through the signup prompt are dropped
+ * from every visitor step (Web PR #1660); `existingStudentVisits` is how many
+ * sessions that removed. `googleCancelled` / `googleFailed` are Google
+ * sign-ins that created no account, recorded only from `googleOutcomesSince`.
  */
 export interface VisitorFunnel {
   visitors: number
@@ -417,6 +422,8 @@ export interface VisitorFunnel {
   signupPromptShown: number
   googleClicked: number
   signedUp: number
+  googleCancelled: number
+  googleFailed: number
 }
 
 export interface SignupFunnel {
@@ -434,6 +441,14 @@ export interface SignupFunnel {
 
 export type FunnelSourceKey = keyof SignupSourceBreakdown
 export type FunnelLandingKey = LandingType | 'unknown'
+
+/**
+ * Device of a visit (Web PR #1661), from the first page load's user agent.
+ * `in_app` (Instagram/Facebook/TikTok/Snapchat or another app's built-in
+ * browser) wins over the platform. `unknown` = visits from before devices
+ * were recorded, plus any platform Web doesn't classify.
+ */
+export type FunnelDeviceKey = 'in_app' | 'ios' | 'android' | 'computer' | 'unknown'
 
 export type WallGate = 'lesson' | 'exercise' | 'ai_quota'
 
@@ -470,8 +485,11 @@ export interface PaymentFunnel {
 
 export interface FunnelMetrics {
   eventsTrackedSince: string | null
+  existingStudentVisits: number
+  googleOutcomesSince: string | null
   visitors: VisitorFunnel
   visitorsByLandingType: Record<LandingType, VisitorFunnel>
+  visitorsByDevice: Record<FunnelDeviceKey, VisitorFunnel>
   signups: SignupFunnel
   firstWeekActiveDays: number[]
   bySource: Record<FunnelSourceKey, SignupFunnel>

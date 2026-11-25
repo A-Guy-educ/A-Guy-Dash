@@ -2,6 +2,19 @@
 
 All notable changes to A-Guy-Dash are documented here. Follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## v0.11.0 — 2026-11-25
+
+Funnel follow-ups, backed by Web #1660 and #1661. Google sign-ins that created no account are split into cancelled and failed (shown only for periods covered by `googleOutcomesSince`), a note counts the existing-student sessions Web now drops from the visitor steps, and a new table breaks the visitor funnel down by device (in-app browser / iOS / Android / computer / unknown). The "Saw signup prompt" step is renamed "Reached sign-in". Every new field defaults, so against a Web build without these PRs the Google breakdown shows a "not tracked" note and the device table renders empty.
+
+### Features
+
+- Funnel: Google sign-in outcomes (cancelled / failed) and existing-student note (#60).
+- Funnel: visitors by device table (#61).
+
+### Bug Fixes
+
+- Funnel: rename "Saw signup prompt" to "Reached sign-in" (#62).
+
 ## v0.10.0 — 2026-11-24
 
 New Funnel tab, backed by Web #1631, #1639 and #1641. Follows visitors from landing through the signup prompt and Google sign-in to signup, then signups through first-week activity (Alive / Did something / Came back, plus a days-active histogram), the paywall, plan pick, checkout and payment. Breakdowns by landing type and traffic source, and a per-wall table (lesson / exercise / AI quota) showing hits, repeat and dismissed students, and which wall each plan pick or payment followed. Every field in the new `funnel` block defaults to zero, so against a Web build without these PRs the tab renders empty instead of failing the dashboard.

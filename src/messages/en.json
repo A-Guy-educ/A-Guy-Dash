@@ -164,6 +164,9 @@
       "emptyState": "No funnel data yet.",
       "visitorsTitle": "Visitors → signup",
       "visitorsByLandingTitle": "Visitors by landing page",
+      "visitorsByDeviceTitle": "By device",
+      "clickedToSignedUp": "Clicked → signed up",
+      "deviceNote": "Device is recorded from the first page load of each visit. iPhone WhatsApp/Telegram links look like Safari and count as iPhone.",
       "signupsTitle": "New signups → first week",
       "activeDaysTitle": "Days active in first week",
       "bySourceTitle": "By source",
@@ -173,6 +176,7 @@
       "wallsChartTitle": "What happened after each wall",
       "wallsTableTitle": "Walls",
       "likelyBots": "incl. {n} likely bots",
+      "existingStudentsNote": "{n} visits were existing students logging back in and are not counted",
       "ofHumans": "of real visitors",
       "ofSignedUp": "of signups",
       "ofPaywall": "of students who hit a wall",
@@ -185,7 +189,7 @@
       "rowKey": "",
       "steps": {
         "humans": "Real visitors",
-        "signupPromptShown": "Saw signup prompt",
+        "signupPromptShown": "Reached sign-in",
         "googleClicked": "Clicked Google",
         "signedUp": "Signed up",
         "activeFirstWeek": "Alive",
@@ -196,12 +200,23 @@
         "checkoutStarted": "Started checkout",
         "paid": "Paid"
       },
+      "stepHints": {
+        "signupPromptShown": "Got to the sign-in step: lesson visitors pressed Start, home visitors got through the /start wizard."
+      },
       "tooltips": {
         "activeFirstWeek": "Opened any lesson or answered a question in the first 7 days.",
         "engagedFirstWeek": "60s+ in a lesson, or answered a question, in the first 7 days.",
         "returnedFirstWeek": "Did something again on a later day in the first week (24h+ after signup).",
         "planSelected": "Clicked a plan on an upgrade wall, or Subscribe on the plans page.",
-        "afterIt": "Credited to the last wall the student hit before picking a plan / paying. Each student counts under one wall."
+        "afterIt": "Credited to the last wall the student hit before picking a plan / paying. Each student counts under one wall.",
+        "noReturn": "Closed the Google window, or Google blocked sign-in (e.g. inside Instagram/TikTok/WhatsApp browsers)."
+      },
+      "googleOutcomes": {
+        "cancelled": "Cancelled on Google",
+        "failed": "Sign-in failed",
+        "noReturn": "Didn't come back from Google",
+        "trackingStarted": "Cancel / fail tracking started {date}",
+        "notTracked": "Cancel / fail not tracked yet"
       },
       "sideStats": {
         "paywallDismissed": "Continued without help",
@@ -221,6 +236,13 @@
         "home": "Home",
         "other": "Other",
         "unknown": "Unknown"
+      },
+      "devices": {
+        "in_app": "In-app browser (Instagram, TikTok…)",
+        "ios": "iPhone",
+        "android": "Android",
+        "computer": "Computer",
+        "unknown": "Unknown (before tracking)"
       },
       "gates": {
         "ai_quota": "AI quota (daily limit)",

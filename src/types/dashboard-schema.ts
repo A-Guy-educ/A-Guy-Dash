@@ -143,6 +143,7 @@ const revenueSegmentsSchema = z.object({
 
 // Funnel (Web PR #1631). Same degrade-to-zeros approach as guestInsights so
 // a Web deploy without the block renders an empty tab instead of 502-ing.
+// googleCancelled / googleFailed added by Web PR #1660.
 const visitorFunnelSchema = z
   .object({
     visitors: count,
@@ -150,6 +151,8 @@ const visitorFunnelSchema = z
     signupPromptShown: count,
     googleClicked: count,
     signedUp: count,
+    googleCancelled: count,
+    googleFailed: count,
   })
   .prefault({})
 
@@ -184,6 +187,8 @@ const wallGateSchema = z
 export const funnelSchema = z
   .object({
     eventsTrackedSince: z.string().nullable().default(null),
+    existingStudentVisits: count,
+    googleOutcomesSince: z.string().nullable().default(null),
     visitors: visitorFunnelSchema,
     visitorsByLandingType: z
       .object({
@@ -192,6 +197,16 @@ export const funnelSchema = z
         start: visitorFunnelSchema,
         home: visitorFunnelSchema,
         other: visitorFunnelSchema,
+      })
+      .prefault({}),
+    // Web PR #1661.
+    visitorsByDevice: z
+      .object({
+        in_app: visitorFunnelSchema,
+        ios: visitorFunnelSchema,
+        android: visitorFunnelSchema,
+        computer: visitorFunnelSchema,
+        unknown: visitorFunnelSchema,
       })
       .prefault({}),
     signups: signupFunnelSchema,

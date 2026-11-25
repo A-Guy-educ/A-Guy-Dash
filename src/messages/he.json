@@ -164,6 +164,9 @@
       "emptyState": "אין עדיין נתוני משפך.",
       "visitorsTitle": "מבקרים ← הרשמה",
       "visitorsByLandingTitle": "מבקרים לפי עמוד נחיתה",
+      "visitorsByDeviceTitle": "לפי מכשיר",
+      "clickedToSignedUp": "לחצו ← נרשמו",
+      "deviceNote": "המכשיר נרשם בטעינת העמוד הראשונה של כל ביקור. קישורי WhatsApp/Telegram באייפון נראים כמו Safari ונספרים כ-iPhone.",
       "signupsTitle": "נרשמים חדשים ← שבוע ראשון",
       "activeDaysTitle": "ימי פעילות בשבוע הראשון",
       "bySourceTitle": "לפי מקור",
@@ -173,6 +176,7 @@
       "wallsChartTitle": "מה קרה אחרי כל חסימה",
       "wallsTableTitle": "חסימות",
       "likelyBots": "כולל {n} בוטים סבירים",
+      "existingStudentsNote": "{n} ביקורים היו של תלמידים קיימים שהתחברו מחדש, והם לא נספרים",
       "ofHumans": "מהמבקרים האמיתיים",
       "ofSignedUp": "מהנרשמים",
       "ofPaywall": "מהתלמידים שנתקלו בחסימה",
@@ -185,7 +189,7 @@
       "rowKey": "",
       "steps": {
         "humans": "מבקרים אמיתיים",
-        "signupPromptShown": "ראו הצעת הרשמה",
+        "signupPromptShown": "הגיעו להתחברות",
         "googleClicked": "לחצו על Google",
         "signedUp": "נרשמו",
         "activeFirstWeek": "בחיים",
@@ -196,12 +200,23 @@
         "checkoutStarted": "התחילו תשלום",
         "paid": "שילמו"
       },
+      "stepHints": {
+        "signupPromptShown": "הגיעו לשלב ההתחברות: מבקרים בשיעור לחצו על התחלה, מבקרים בדף הבית עברו את אשף ה-/start."
+      },
       "tooltips": {
         "activeFirstWeek": "פתחו שיעור כלשהו או ענו על שאלה ב-7 הימים הראשונים.",
         "engagedFirstWeek": "60 שניות ומעלה בשיעור, או מענה על שאלה, ב-7 הימים הראשונים.",
         "returnedFirstWeek": "עשו משהו שוב ביום מאוחר יותר בשבוע הראשון (24 שעות ומעלה אחרי ההרשמה).",
         "planSelected": "לחצו על תוכנית בחסימת שדרוג, או על הרשמה בעמוד התוכניות.",
-        "afterIt": "נזקף לחסימה האחרונה שהתלמיד נתקל בה לפני שבחר תוכנית / שילם. כל תלמיד נספר תחת חסימה אחת."
+        "afterIt": "נזקף לחסימה האחרונה שהתלמיד נתקל בה לפני שבחר תוכנית / שילם. כל תלמיד נספר תחת חסימה אחת.",
+        "noReturn": "סגרו את חלון Google, או ש-Google חסם את ההתחברות (למשל בתוך הדפדפן של Instagram/TikTok/WhatsApp)."
+      },
+      "googleOutcomes": {
+        "cancelled": "ביטלו ב-Google",
+        "failed": "ההתחברות נכשלה",
+        "noReturn": "לא חזרו מ-Google",
+        "trackingStarted": "המעקב אחרי ביטולים / כישלונות התחיל ב-{date}",
+        "notTracked": "עדיין אין מעקב אחרי ביטולים / כישלונות"
       },
       "sideStats": {
         "paywallDismissed": "המשיכו בלי עזרה",
@@ -221,6 +236,13 @@
         "home": "בית",
         "other": "אחר",
         "unknown": "לא ידוע"
+      },
+      "devices": {
+        "in_app": "דפדפן בתוך אפליקציה (Instagram, TikTok…)",
+        "ios": "iPhone",
+        "android": "Android",
+        "computer": "מחשב",
+        "unknown": "לא ידוע (לפני המעקב)"
       },
       "gates": {
         "ai_quota": "מכסת AI (מגבלה יומית)",

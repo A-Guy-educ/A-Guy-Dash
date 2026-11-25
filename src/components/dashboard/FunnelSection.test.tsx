@@ -1,6 +1,6 @@
 import React from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { describe, expect, it, vi } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
 import { I18nProvider } from '@/components/i18n'
 import en from '@/messages/en.json'
@@ -11,10 +11,25 @@ import { FunnelSection } from './FunnelSection'
 
 vi.stubGlobal('React', React)
 
-const funnel = funnelSchema.parse({
+const funnelInput = {
   eventsTrackedSince: '2026-11-18',
-  visitors: { visitors: 120, humans: 100, signupPromptShown: 60, googleClicked: 30, signedUp: 20 },
+  googleOutcomesSince: '2026-11-20' as string | null,
+  existingStudentVisits: 7,
+  visitors: {
+    visitors: 120,
+    humans: 100,
+    signupPromptShown: 60,
+    googleClicked: 30,
+    signedUp: 20,
+    googleCancelled: 4,
+    googleFailed: 1,
+  },
   visitorsByLandingType: { lesson: { visitors: 50, humans: 45, signedUp: 10 } },
+  visitorsByDevice: {
+    in_app: { visitors: 30, humans: 25, googleClicked: 10, signedUp: 2, googleCancelled: 3 },
+    ios: { visitors: 40, humans: 35, googleClicked: 12, signedUp: 9 },
+    unknown: { visitors: 50, humans: 40 },
+  },
   signups: {
     signedUp: 20,
     activeFirstWeek: 15,
@@ -38,9 +53,14 @@ const funnel = funnelSchema.parse({
       lesson: { students: 8, hits: 9, decidedPlan: 4, decidedPaid: 2 },
     },
   },
-})
+}
 
-function render(locale: 'en' | 'he', period: 'day' | 'month' = 'month') {
+function render(
+  locale: 'en' | 'he',
+  period: 'day' | 'month' = 'month',
+  overrides: Partial<typeof funnelInput> = {},
+) {
+  const funnel = funnelSchema.parse({ ...funnelInput, ...overrides })
   return renderToStaticMarkup(
     <I18nProvider locale={locale} messages={locale === 'en' ? en : he}>
       <FunnelSection funnel={funnel} period={period} segment="b2b" />
@@ -49,6 +69,15 @@ function render(locale: 'en' | 'he', period: 'day' | 'month' = 'month') {
 }
 
 describe('FunnelSection', () => {
+  // Tracking notes compare the period start to fixed dates, so pin "today".
+  beforeAll(() => {
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date(2026, 10, 24, 12, 0, 0))
+  })
+  afterAll(() => {
+    vi.useRealTimers()
+  })
+
   it.each(['en', 'he'] as const)('renders every label from the %s messages', (locale) => {
     expect(render(locale)).not.toMatch(/dashboard\.funnel\./)
   })
@@ -56,6 +85,8 @@ describe('FunnelSection', () => {
   it('renders the sections, wall outcomes and caveats', () => {
     const html = render('en')
     expect(html).toContain('Real visitors')
+    expect(html).toContain('Reached sign-in')
+    expect(html).toContain('lesson visitors pressed Start')
     expect(html).toContain('incl. 20 likely bots')
     expect(html).toContain('Days active in first week')
     expect(html).toContain('Students whose first week is over (8)')
@@ -73,5 +104,60 @@ describe('FunnelSection', () => {
 
   it('drops the tracking note when the period starts after tracking began', () => {
     expect(render('en', 'day')).not.toContain('Wall, plan and checkout tracking started')
+  })
+
+  it('notes existing students dropped from the visitor steps, hidden at 0', () => {
+    expect(render('en')).toContain('7 visits were existing students logging back in')
+    expect(render('en', 'month', { existingStudentVisits: 0 })).not.toContain(
+      'existing students logging back in',
+    )
+  })
+
+  it('breaks down Google clicks that did not sign up once tracking covers the period', () => {
+    const html = render('en', 'day')
+    expect(html).toMatch(/Cancelled on Google<\/span><span class="tabular-nums shrink-0">4</)
+    expect(html).toMatch(/Sign-in failed<\/span><span class="tabular-nums shrink-0">1</)
+    expect(html).toContain('come back from Google')
+    expect(html).not.toContain('Cancel / fail')
+  })
+
+  it('swaps the breakdown for a note when the period predates tracking', () => {
+    const html = render('en', 'month')
+    expect(html).toContain('Cancel / fail tracking started')
+    expect(html).not.toContain('Cancelled on Google')
+  })
+
+  it('says cancel / fail is not tracked when Web has no start date', () => {
+    const html = render('en', 'day', { googleOutcomesSince: null })
+    expect(html).toContain('Cancel / fail not tracked yet')
+    expect(html).not.toContain('Cancelled on Google')
+  })
+
+  describe('by device', () => {
+    // Only the device card, so other cards can't satisfy a match.
+    const deviceCard = (html: string) =>
+      html.slice(html.indexOf('By device'), html.indexOf('New signups → first week'))
+
+    it('orders rows by real visitors with unknown last and hides empty ones', () => {
+      const html = deviceCard(render('en', 'day'))
+      expect(html.indexOf('iPhone')).toBeLessThan(html.indexOf('In-app browser'))
+      expect(html.indexOf('In-app browser')).toBeLessThan(html.indexOf('Unknown (before tracking)'))
+      expect(html).not.toContain('Android')
+      expect(html).toContain('Device is recorded from the first page load')
+    })
+
+    it('shows clicked → signed up, with — when nobody clicked', () => {
+      const html = deviceCard(render('en', 'day'))
+      expect(html).toContain('75.0%')
+      expect(html).toContain('20.0%')
+      expect(html).toContain('—')
+    })
+
+    it('shows the outcome columns only when tracking covers the period', () => {
+      expect(deviceCard(render('en', 'day'))).toContain('Sign-in failed')
+      const before = deviceCard(render('en', 'month'))
+      expect(before).not.toContain('Sign-in failed')
+      expect(before).toContain('Cancel / fail tracking started')
+    })
   })
 })

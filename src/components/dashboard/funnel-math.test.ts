@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  devicesByHumans,
   formatRatio,
   gatesByStudents,
+  googleDropOff,
   periodStartYmd,
   startsBeforeTracking,
   wallSegments,
@@ -58,6 +60,55 @@ describe('wallSegments', () => {
 
   it('never goes negative when paid exceeds picked-plan', () => {
     expect(wallSegments(gate(5, 1, 2))).toEqual({ paid: 2, planNoPay: 0, noPlan: 3 })
+  })
+})
+
+describe('googleDropOff', () => {
+  const visitors = (
+    googleClicked: number,
+    signedUp: number,
+    cancelled: number,
+    failed: number,
+  ) => ({
+    visitors: 0,
+    humans: 0,
+    signupPromptShown: 0,
+    googleClicked,
+    signedUp,
+    googleCancelled: cancelled,
+    googleFailed: failed,
+  })
+
+  it('treats the remainder after cancels and failures as no return', () => {
+    expect(googleDropOff(visitors(30, 20, 4, 1))).toEqual({ cancelled: 4, failed: 1, noReturn: 5 })
+  })
+
+  it('floors no return at 0', () => {
+    expect(googleDropOff(visitors(10, 9, 2, 1)).noReturn).toBe(0)
+  })
+})
+
+describe('devicesByHumans', () => {
+  const device = (visitors: number, humans: number) => ({
+    visitors,
+    humans,
+    signupPromptShown: 0,
+    googleClicked: 0,
+    signedUp: 0,
+    googleCancelled: 0,
+    googleFailed: 0,
+  })
+
+  it('orders by real visitors, keeps unknown last and drops empty rows', () => {
+    expect(
+      devicesByHumans({
+        in_app: device(30, 25),
+        ios: device(40, 35),
+        android: device(0, 0),
+        computer: device(12, 10),
+        unknown: device(90, 80),
+      }),
+    ).toEqual(['ios', 'in_app', 'computer', 'unknown'])
   })
 })
 
